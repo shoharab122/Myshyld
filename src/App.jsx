@@ -293,7 +293,7 @@ function useLiquid() {
   useEffect(() => {
     let st = document.getElementById('lq-css')
     if (!st) { st = document.createElement('style'); st.id = 'lq-css'; document.head.appendChild(st) }
-    if (st.textContent !== LIQUID_CSS) st.textContent = LIQUID_CSS
+    if (st.textContent !== LIQUID_CSS + LOC_CSS) st.textContent = LIQUID_CSS + LOC_CSS
     if (NOMOTION) return
     const light = (el, e) => {
       const r = el.getBoundingClientRect()
@@ -380,22 +380,160 @@ const ProductCard = memo(({ p, i, add, open, liked, like }) => <div className="c
 const Grid = memo(({ list, loading, add, open, wish, like }) => loading ? <div className="grid">{[...Array(6)].map((_, i) => <div key={i} className="skel" />)}</div>
   : list.length ? <div className="grid">{list.map((p, i) => <ProductCard key={p.id} {...{ p, i, add, open, like }} liked={wish.has(p.id)} />)}</div> : <p className="empty">No products found.</p>)
 
+/* ---------- Location: chip + map picker ---------- */
+const LOC_CSS = `
+.topbar .loc{display:flex;align-items:center;gap:10px;max-width:calc(100% - 60px);padding:6px 14px 6px 6px;border-radius:999px;background:#fff;border:1px solid var(--edge);box-shadow:0 8px 22px #4a166822;text-align:left;min-width:0}
+.loc .lp{width:38px;height:38px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#8e2a8c,#e0457b);box-shadow:0 6px 14px #e0457b55,inset 0 1px 0 #ffffff70;position:relative}
+.loc .lp::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #e0457b55;animation:locPulse 2.4s ease-out infinite}
+@keyframes locPulse{from{transform:scale(.85);opacity:1}to{transform:scale(1.35);opacity:0}}
+.loc .lt{display:grid;min-width:0;line-height:1.2}
+.loc .lt small{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.loc .lt b{font-size:14px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.loc>i{font-style:normal;color:var(--p3);font-size:13px;flex:none}
+.mp{display:grid;gap:12px;padding-bottom:6px}
+.mp-box{position:relative;height:min(46dvh,380px);min-height:260px;border-radius:24px;overflow:hidden;border:1px solid var(--edge);box-shadow:0 12px 30px #4a166826;background:#ece4f7}
+.mp-map{position:absolute;inset:0;z-index:1;touch-action:none}
+.mp-pin{position:absolute;left:50%;top:50%;width:44px;height:54px;margin:-54px 0 0 -22px;z-index:500;pointer-events:none;filter:drop-shadow(0 8px 6px #4a166855);transition:transform .2s}
+.mp-box.mv .mp-pin{transform:translateY(-10px)}
+.mp-dot{position:absolute;left:50%;top:50%;width:14px;height:6px;margin:-3px 0 0 -7px;border-radius:50%;background:#4a166855;z-index:499;pointer-events:none;transition:transform .2s,opacity .2s}
+.mp-box.mv .mp-dot{transform:scale(1.6);opacity:.4}
+.mp-gps{position:absolute;right:12px;bottom:12px;z-index:600;width:48px;height:48px;border-radius:50%;background:#fff;color:var(--p1);display:grid;place-items:center;box-shadow:0 8px 20px #4a166844;border:0;cursor:pointer}
+.mp-gps:active{transform:scale(.92)}
+.mp-gps.ld svg{animation:locSpin 1s linear infinite}@keyframes locSpin{to{transform:rotate(360deg)}}
+.mp-hint{position:absolute;left:12px;top:12px;z-index:600;max-width:calc(100% - 24px);background:#fffffff0;border-radius:999px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--p1);box-shadow:0 6px 16px #4a166822}
+.mp-ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;color:var(--mute);font-size:13px;z-index:2}
+.mp-sr{position:relative}.mp-sr .search{margin:0}
+.mp-res{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:700;background:#fff;border-radius:18px;border:1px solid var(--edge);box-shadow:0 16px 36px #4a166833;overflow:hidden;max-height:240px;overflow-y:auto}
+.mp-res button{all:unset;box-sizing:border-box;width:100%;display:flex;gap:10px;align-items:flex-start;padding:12px 14px;cursor:pointer;font-size:13px;border-top:1px solid var(--edge);line-height:1.3}
+.mp-res button:first-child{border-top:0}.mp-res button:active,.mp-res button:hover{background:#faf5fd}
+.mp-res button span{color:var(--p3);flex:none}
+.mp-card{display:flex;gap:12px;align-items:center;padding:14px;border-radius:22px;background:#fff;border:1px solid var(--edge);box-shadow:0 6px 18px #4a166814}
+.mp-card>span{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#f3e9fb,#fde7f0);display:grid;place-items:center;color:var(--p3);flex:none}
+.mp-card div{display:grid;min-width:0}.mp-card small{font-size:11px;color:var(--mute)}.mp-card b{font-size:14px;overflow-wrap:anywhere}
+.mp-err{font-size:12px;color:#c62d4a;margin:0}
+.mp-man{border:1px dashed #d9c8e8;border-radius:22px;padding:14px;display:grid;gap:2px;background:#fffc}
+.mp-man h5{margin:0 0 10px;font-size:13px;color:var(--p1)}
+.mp-sect{font-size:12px;font-weight:700;color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin:4px 2px 0}
+.leaflet-container{font:inherit;background:#ece4f7}.leaflet-control-attribution{font-size:9px!important;background:#ffffffcc!important}
+.leaflet-control-zoom{display:none}
+@media(max-width:480px){.mp-box{height:42dvh;border-radius:20px}.topbar .loc{padding-right:12px}}
+@media(min-width:900px){.mp{grid-template-columns:1.2fr 1fr;align-items:start}.mp-box{grid-row:span 3;height:480px}}
+`
+
+// Loads Leaflet (OpenStreetMap) once from a CDN; no npm install needed
+let leafletP
+const loadLeaflet = () => leafletP || (leafletP = new Promise((res, rej) => {
+  if (window.L) return res(window.L)
+  const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(css)
+  const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'
+  sc.onload = () => window.L ? res(window.L) : rej(new Error('leaflet')); sc.onerror = () => { leafletP = null; rej(new Error('leaflet')) }; document.head.appendChild(sc)
+}))
+const CTG = [22.3569, 91.7832]
+const nom = async (path, signal) => { const r = await fetch('https://nominatim.openstreetmap.org/' + path + '&format=jsonv2&addressdetails=1&accept-language=en', { signal }); if (!r.ok) throw new Error('geo'); return r.json() }
+const parseAddr = a => {
+  if (!a) return {}
+  const area = a.suburb || a.neighbourhood || a.quarter || a.city_district || a.village || ''
+  const line = [a.house_number, a.road].filter(Boolean).join(', ')
+  const city = a.city || a.town || a.state_district || a.county || ''
+  return { area, line, city: city.replace(/ (City|District|Division)$/i, '') }
+}
+const PinSvg = () => <svg viewBox="0 0 44 54" width="44" height="54" aria-hidden="true"><defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#8e2a8c" /><stop offset="1" stopColor="#e0457b" /></linearGradient></defs><path d="M22 52S4 33 4 20a18 18 0 0 1 36 0c0 13-18 32-18 32z" fill="url(#pg)" stroke="#fff" strokeWidth="2.5" /><circle cx="22" cy="20" r="7" fill="#fff" /></svg>
+const LocChip = ({ loc, onClick }) => <button className="loc" aria-label="Change delivery location" onClick={onClick}><span className="lp"><Icon n="pin" /></span><span className="lt"><small>Deliver to</small><b>{loc.area || loc.city}</b></span><i>⌄</i></button>
+
 const fullAddr = l => l ? [l.line, l.area, l.city].filter(Boolean).join(', ') : ''
 const AREAS = ['GEC Circle', 'Agrabad', 'Nasirabad', 'Khulshi', 'Halishahar', 'Pahartali', 'Chawkbazar', 'Kotwali', 'Panchlaish', 'Bayezid', 'Patenga', 'Muradpur', 'Oxygen', '2 No Gate', 'Bahaddarhat']
 
 function AddressScreen({ loc, back, onSave }) {
   const [f, setF] = useState(loc)
+  const [pt, setPt] = useState(loc.lat ? [loc.lat, loc.lng] : null)
+  const [mapOk, setMapOk] = useState(null), [moving, setMoving] = useState(false), [gps, setGps] = useState(false), [err, setErr] = useState('')
+  const [sq, setSq] = useState(''), [res, setRes] = useState([]), [sb, setSb] = useState(false)
+  const el = useRef(null), map = useRef(null), skip = useRef(false), ab = useRef(null), tm = useRef(0)
   const set = k => e => setF(x => ({ ...x, [k]: e.target.value }))
-  const clean = { city: f.city.trim() || 'Chattogram', area: f.area.trim(), line: f.line.trim() }
+  const clean = { city: f.city.trim() || 'Chattogram', area: f.area.trim(), line: f.line.trim(), ...(pt ? { lat: +pt[0].toFixed(6), lng: +pt[1].toFixed(6) } : {}) }
   const save = () => onSave(clean.area || clean.line ? clean : null)
-  return <><Hdr title="Delivery Address" back={back} />
-    <div className="scr narrow addr">
-      <div className="prev"><span>📍</span><div><small>Delivering to</small><b>{fullAddr(clean) || 'Nothing set yet'}</b></div></div>
-      <label className="lbl">City<input className="inp" value={f.city} onChange={set('city')} autoComplete="address-level2" /></label>
-      <label className="lbl">Area<input className="inp" placeholder="e.g. Agrabad, Khulshi" value={f.area} onChange={set('area')} autoComplete="address-level3" /></label>
-      <div className="chips wrap" role="group" aria-label="Popular areas">{AREAS.map(a => <button key={a} type="button" className={f.area === a ? 'on' : ''} onClick={() => setF(x => ({ ...x, area: a }))}>{a}</button>)}</div>
-      <label className="lbl">House, road &amp; landmark<textarea className="inp" rows="3" placeholder="House 12, Road 3, near ..." value={f.line} onChange={set('line')} autoComplete="street-address" /></label></div>
-    <div className="buybar one"><button className="btn" onClick={save}>Save address</button></div></>
+
+  const reverse = useCallback(async (lat, lng) => {
+    ab.current?.abort(); ab.current = new AbortController(); setErr('')
+    try {
+      const d = await nom(`reverse?lat=${lat}&lon=${lng}&zoom=18`, ab.current.signal)
+      const a = parseAddr(d.address)
+      setF(x => ({ ...x, city: a.city || x.city || 'Chattogram', area: a.area || x.area, line: a.line || x.line }))
+    } catch (e) { if (e.name !== 'AbortError') setErr('Could not read the address here. Please fill it in below.') }
+  }, [])
+
+  useEffect(() => {
+    let dead = false
+    loadLeaflet().then(L => {
+      if (dead || !el.current) return
+      const m = L.map(el.current, { center: pt || CTG, zoom: pt ? 17 : 13, zoomControl: false, attributionControl: true })
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(m)
+      m.on('movestart', () => setMoving(true))
+      m.on('moveend', () => {
+        setMoving(false)
+        if (skip.current) { skip.current = false; return }
+        const c = m.getCenter(); setPt([c.lat, c.lng])
+        clearTimeout(tm.current); tm.current = setTimeout(() => reverse(c.lat, c.lng), 450)
+      })
+      map.current = m; setMapOk(true)
+      setTimeout(() => m.invalidateSize(), 250)
+    }).catch(() => !dead && setMapOk(false))
+    return () => { dead = true; clearTimeout(tm.current); ab.current?.abort(); map.current?.remove(); map.current = null }
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+
+  const locate = () => {
+    if (!navigator.geolocation) return setErr('Location is not supported on this device.')
+    setGps(true); setErr('')
+    navigator.geolocation.getCurrentPosition(
+      p => { setGps(false); const { latitude: a, longitude: b } = p.coords; setPt([a, b]); map.current?.setView([a, b], 17); if (!map.current) reverse(a, b) },
+      e => { setGps(false); setErr(e.code === 1 ? 'Location permission denied. Allow it in your browser settings, or move the map manually.' : 'Could not get your location. Move the map or type your address.') },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 })
+  }
+
+  useEffect(() => {
+    if (sq.trim().length < 3) { setRes([]); return }
+    const c = new AbortController()
+    const t = setTimeout(async () => {
+      setSb(true)
+      try { const d = await nom(`search?q=${encodeURIComponent(sq + ', Chattogram, Bangladesh')}&limit=5&countrycodes=bd`, c.signal); setRes(d) } catch { /* ignore */ }
+      setSb(false)
+    }, 500)
+    return () => { clearTimeout(t); c.abort() }
+  }, [sq])
+
+  const pick = r => {
+    const lat = +r.lat, lng = +r.lon, a = parseAddr(r.address)
+    setRes([]); setSq(''); setPt([lat, lng])
+    setF(x => ({ ...x, city: a.city || x.city, area: a.area || x.area, line: a.line || x.line }))
+    skip.current = true; map.current?.setView([lat, lng], 17)
+  }
+
+  return <><Hdr title="Delivery Location" back={back} />
+    <div className="scr narrow addr mp">
+      <div className="mp-sr">
+        <div className="search"><Icon n="search" /><input placeholder="Search area, road or landmark" value={sq} onChange={e => setSq(e.target.value)} aria-label="Search location" />{sb && <i className="spin" />}</div>
+        {res.length > 0 && <div className="mp-res" role="listbox">{res.map(r => <button key={r.place_id} type="button" onClick={() => pick(r)}><span>📍</span><div>{r.display_name}</div></button>)}</div>}
+      </div>
+      <div className={'mp-box' + (moving ? ' mv' : '')}>
+        <div ref={el} className="mp-map" />
+        {mapOk === null && <div className="mp-ph"><i className="spin" /></div>}
+        {mapOk === false && <div className="mp-ph">Map could not load.<br />You can still type your address below.</div>}
+        {mapOk && <><span className="mp-dot" /><span className="mp-pin"><PinSvg /></span><div className="mp-hint">{moving ? 'Release to set pin' : 'Drag the map to move the pin'}</div></>}
+        <button type="button" className={'mp-gps' + (gps ? ' ld' : '')} aria-label="Use my current location" onClick={locate}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /></svg>
+        </button>
+      </div>
+      {err && <p className="mp-err" role="alert">{err}</p>}
+      <div className="mp-card"><span><Icon n="pin" /></span><div><small>Delivering to</small><b>{fullAddr(clean) || 'Move the pin or search to set location'}</b></div></div>
+      <div className="mp-man">
+        <h5>✏️ Adjust manually</h5>
+        <label className="lbl">City<input className="inp" value={f.city} onChange={set('city')} autoComplete="address-level2" /></label>
+        <label className="lbl">Area<input className="inp" placeholder="e.g. Agrabad, Khulshi" value={f.area} onChange={set('area')} autoComplete="address-level3" /></label>
+        <div className="chips wrap" role="group" aria-label="Popular areas">{AREAS.map(a => <button key={a} type="button" className={f.area === a ? 'on' : ''} onClick={() => setF(x => ({ ...x, area: a }))}>{a}</button>)}</div>
+        <label className="lbl" style={{ marginTop: 12 }}>House, road &amp; landmark<textarea className="inp" rows="3" placeholder="House 12, Road 3, near ..." value={f.line} onChange={set('line')} autoComplete="street-address" /></label>
+      </div>
+    </div>
+    <div className="buybar one"><button className="btn" onClick={save}>Confirm location</button></div></>
 }
 
 const CartItem = memo(({ i, qty }) => <div className="item rise"><Pic p={i} /><div><b style={{ color: '#2a1a3a' }}>{i.name}</b><br /><small style={{ color: '#8b8197' }}>{i.variant}</small><br /><b>{taka(i.price)}</b></div>
@@ -617,7 +755,7 @@ export default function App() {
     </div></div>
 
   if (s === 'home') body = <div className="scr hm">
-    <div className="topbar"><button className="loc" aria-label="Change delivery address" onClick={() => go('address')}><small>Deliver to</small><b>📍 {loc.area || loc.city} <i>⌄</i></b></button><button className="ib" aria-label="Open cart" onClick={() => tab('cart')}><Icon n="bag" />{count > 0 && <em className="cb" key={count}>{count}</em>}</button></div>
+    <div className="topbar"><LocChip loc={loc} onClick={() => go('address')} /><button className="ib" aria-label="Open cart" onClick={() => tab('cart')}><Icon n="bag" />{count > 0 && <em className="cb" key={count}>{count}</em>}</button></div>
     <div className="search"><Icon n="search" /><input placeholder="What are you looking for?" value={q} onChange={e => setQ(e.target.value)} /><button className="sf" aria-label="Filters" onClick={() => tab('categories')}><Icon n="sliders" /></button></div>
     <Banner shop={tab} />
     <div className="sec">Categories <a onClick={() => tab('categories')}>See all</a></div>
