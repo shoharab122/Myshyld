@@ -247,6 +247,43 @@ const LIQUID_CSS = `
 .pf .pf-out .ico{width:18px;height:18px}
 .pf .pf-out:active{transform:scale(.97)}
 @media(hover:hover){.pf .pf-out:hover{background:linear-gradient(120deg,#ff7a9c,#ff3358 55%,#b8174f);border-color:transparent;color:#fff}.pf .pf-out:hover span:first-child{background:#ffffff33;color:#fff}}
+/* ---------- Login v2: compact logo, aligned fields, modern glass ---------- */
+.auth{padding:calc(18px + env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))}
+.auth-in{max-width:380px;display:flex;flex-direction:column;align-items:center;margin:auto}
+.auth .lgcard{width:clamp(104px,30vw,128px);padding:12px 14px;margin:0 auto 10px;border-radius:28px;box-shadow:inset 0 2px 8px #fff,0 14px 32px #1a063a55,0 0 0 6px #ffffff1a}
+.auth .lgcard img{animation-duration:4s}
+.auth .tag{font-size:12px;letter-spacing:.08em;margin:0 0 18px;color:#ffffffc9;text-align:center}
+.auth .auth-card{width:100%;margin:0;padding:14px;border-radius:30px;display:grid;gap:12px;align-content:start}
+.auth .auth-card>*{margin:0}
+.auth .tabs{height:50px;padding:4px}
+.auth .tabs button{padding:0;display:grid;place-items:center;font-size:15px}
+.auth .fld{min-height:56px;padding:0 8px 0 7px;gap:10px;border-radius:18px}
+.auth .fld .fi{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;flex:none;background:#ffffff2b;color:#fff;opacity:1;box-shadow:inset 0 1px 0 #ffffff40}
+.auth .fld .fi .ico{width:20px;height:20px}
+.auth .fld input{padding:0;height:54px;line-height:54px}
+.auth .fld .eye{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;flex:none;color:#fff;opacity:.9;background:none}
+.auth .fld .eye .ico{width:21px;height:21px}
+.auth .forgot{text-align:right;margin:-2px 4px 0;font-size:13px}
+.auth .btn{min-height:54px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 20px}
+.auth .or{margin:2px 0;gap:12px;font-size:12px}
+.auth .socials{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.auth .social{width:100%;min-height:52px;padding:0 10px;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:9px;background:#ffffff30;border-color:#ffffff59}
+.auth .social .ico{flex:none}
+.auth .sw{margin:16px 0 0;font-size:13.5px}
+.auth .trust{margin:10px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;font-size:11.5px}
+.auth .trust .ico{width:13px;height:13px}
+.auth-in>.lgcard,.auth-in>.tag,.auth-in>.sw,.auth-in>.trust{animation:up .55s var(--ease) both}
+.auth-in>.tag{animation-delay:.05s}.auth-in>.sw{animation-delay:.2s}.auth-in>.trust{animation-delay:.28s}
+.splash .lgcard{width:clamp(140px,42vw,176px);padding:16px 18px}
+@media(max-height:700px){
+ .auth{padding-top:calc(12px + env(safe-area-inset-top));padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+ .auth .lgcard{width:92px;padding:10px 12px;margin-bottom:6px;border-radius:24px}
+ .auth .tag{margin-bottom:12px;font-size:11.5px}
+ .auth .auth-card{padding:12px;gap:10px}
+ .auth .tabs{height:46px}.auth .fld{min-height:52px}.auth .fld input{height:50px;line-height:50px}
+ .auth .btn{min-height:50px}.auth .social{min-height:48px}.auth .sw{margin-top:12px}
+}
+@media(max-width:340px){.auth .social{font-size:14px;gap:6px}.auth .tabs button{font-size:14px}}
 @media (prefers-reduced-motion:reduce){.fab,.add,.btn{animation:none!important}.rp{display:none}.lq-pop{animation:none!important}}
 `
 const POP = '.add,.fab,.qty button,.ib'
@@ -302,10 +339,15 @@ const ICONS = {
   grid: <><rect x="4" y="4" width="7" height="7" rx="2" /><rect x="13" y="4" width="7" height="7" rx="2" /><rect x="4" y="13" width="7" height="7" rx="2" /><rect x="13" y="13" width="7" height="7" rx="2" /></>,
   receipt: <><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z" /><path d="M9 8h6M9 12h6" /></>,
   user: <><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6" /></>,
+  phone: <><rect x="7" y="2.8" width="10" height="18.4" rx="2.6" /><path d="M10.5 18h3" /></>,
+  eye: <><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>,
+  eyeoff: <><path d="M3 3l18 18" /><path d="M6.5 7.6A16 16 0 0 0 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1M10.6 5.1C11 5 11.5 5 12 5c6.4 0 10 7 10 7a16 16 0 0 1-2.4 3.2" /><path d="M9.9 10a3 3 0 0 0 4.1 4.1" /></>,
   menu: <path d="M4 7h16M4 12h16M4 17h10" />, back: <path d="M15 5l-7 7 7 7" />, search: <><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></>,
   bag: <><path d="M6 8h12l-1 11H7L6 8z" /><path d="M9 8a3 3 0 0 1 6 0" /></>, sliders: <><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></>,
 }
 const Icon = ({ n }) => <svg className="ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONS[n]}</svg>
+const GoogleG = () => <svg className="ico" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z" /><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z" /><path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z" /><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z" /></svg>
+const AppleMark = () => <svg className="ico" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" /></svg>
 const Steps = ({ n }) => <div className="stp">{['Cart', 'Details', 'Payment'].map((l, i) => <div key={l} className={i <= n ? 'on' : ''}><i>{i < n ? '✓' : i + 1}</i><span>{l}</span></div>)}</div>
 const Hdr = ({ title, back, right }) => <div className="hdr"><button className="ib" aria-label="Back" onClick={back}><Icon n="back" /></button><span className="ht">{title}</span>{right || <span className="ib ghost" />}</div>
 const Heart = ({ on, toggle, inl }) => <button className={'heart' + (on ? ' on' : '') + (inl ? ' inl' : '')} aria-label="Wishlist" aria-pressed={on} onClick={e => { e.stopPropagation(); toggle() }}>{on ? '♥' : '♡'}</button>
@@ -562,16 +604,16 @@ export default function App() {
       <p className="tag">Privacy. Confidence. Comfort. Wellness.</p>
       <form className={'auth-card glass' + (shake ? ' shake' : '')} onSubmit={login} noValidate>
         <div className="tabs" data-i={mode === 'login' ? 0 : 1}>{['login', 'signup'].map(m => <button type="button" key={m} className={mode === m ? 'on' : ''} onClick={() => setMode(m)}>{m === 'login' ? 'Login' : 'Sign Up'}</button>)}</div>
-        <label className="fld"><span>📱</span><input placeholder="Phone number or Email" autoComplete="username" inputMode="email" autoCapitalize="none" value={form.id} onChange={e => setForm(f => ({ ...f, id: e.target.value }))} /></label>
-        <label className="fld"><span>🔒</span><input placeholder="Password" type={showPw ? 'text' : 'password'} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={form.pw} onChange={e => setForm(f => ({ ...f, pw: e.target.value }))} />
-          <button type="button" className="eye" aria-label={showPw ? 'Hide password' : 'Show password'} onClick={() => setShowPw(v => !v)}>{showPw ? '🙈' : '👁️'}</button></label>
+        <label className="fld"><span className="fi"><Icon n="phone" /></span><input placeholder="Phone number or Email" aria-label="Phone number or email" autoComplete="username" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck="false" enterKeyHint="next" value={form.id} onChange={e => setForm(f => ({ ...f, id: e.target.value }))} /></label>
+        <label className="fld"><span className="fi"><Icon n="lock" /></span><input placeholder="Password" aria-label="Password" type={showPw ? 'text' : 'password'} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} enterKeyHint="go" value={form.pw} onChange={e => setForm(f => ({ ...f, pw: e.target.value }))} />
+          <button type="button" className="eye" aria-label={showPw ? 'Hide password' : 'Show password'} onClick={() => setShowPw(v => !v)}><Icon n={showPw ? 'eyeoff' : 'eye'} /></button></label>
         <div className="forgot"><button type="button" onClick={() => say('Password reset coming soon')}>Forgot password?</button></div>
         <button className="btn" type="submit" disabled={busy}>{busy ? <i className="spin" /> : mode === 'login' ? 'Login' : 'Create Account'}</button>
         <div className="or"><span>or continue with</span></div>
-        <div className="row" style={{ gap: 12 }}><button type="button" className="btn o social" onClick={login}>G Google</button><button type="button" className="btn o social" onClick={login}> Apple</button></div>
+        <div className="socials"><button type="button" className="btn o social" onClick={login}><GoogleG />Google</button><button type="button" className="btn o social" onClick={login}><AppleMark />Apple</button></div>
       </form>
       <p className="sw">{mode === 'login' ? 'New here?' : 'Already have an account?'} <button type="button" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}>{mode === 'login' ? 'Create an account' : 'Login'}</button></p>
-      <p className="trust">🔒 Private by design · Discreet delivery</p>
+      <p className="trust"><Icon n="lock" />Private by design · Discreet delivery</p>
     </div></div>
 
   if (s === 'home') body = <div className="scr hm">
