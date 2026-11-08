@@ -264,6 +264,7 @@ const LIQUID_CSS = `
 .auth .fld .eye{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;flex:none;color:#fff;opacity:.9;background:none}
 .auth .fld .eye .ico{width:21px;height:21px}
 .auth .forgot{text-align:right;margin:-2px 4px 0;font-size:13px}
+.auth .msg{text-align:center;font-size:13.5px;line-height:1.5;color:#ffffffd9;margin:2px 6px 4px}.auth .msg b{font-size:16px;color:#fff}
 .auth .btn{min-height:54px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 20px}
 .auth .or{margin:2px 0;gap:12px;font-size:12px}
 .auth .socials{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -395,6 +396,7 @@ const ICONS = {
   grid: <><rect x="4" y="4" width="7" height="7" rx="2" /><rect x="13" y="4" width="7" height="7" rx="2" /><rect x="4" y="13" width="7" height="7" rx="2" /><rect x="13" y="13" width="7" height="7" rx="2" /></>,
   receipt: <><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z" /><path d="M9 8h6M9 12h6" /></>,
   user: <><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6" /></>,
+  mail: <><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M4 7l8 6 8-6" /></>,
   phone: <><rect x="7" y="2.8" width="10" height="18.4" rx="2.6" /><path d="M10.5 18h3" /></>,
   eye: <><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>,
   eyeoff: <><path d="M3 3l18 18" /><path d="M6.5 7.6A16 16 0 0 0 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1M10.6 5.1C11 5 11.5 5 12 5c6.4 0 10 7 10 7a16 16 0 0 1-2.4 3.2" /><path d="M9.9 10a3 3 0 0 0 4.1 4.1" /></>,
@@ -637,8 +639,8 @@ export default function App() {
   const [cats, setCats] = useState([]), [prods, setProds] = useState([]), [loading, setLoading] = useState(true)
   const [cart, setCart] = useState(() => readLS('ms_cart', []))
   const [orders, setOrders] = useState([]), [toast, setToast] = useState(''), [liveSt, setLiveSt] = useState({})
-  const [ob, setOb] = useState(0), [mode, setMode] = useState('login')
-  const [form, setForm] = useState({ id: '', pw: '' }), [showPw, setShowPw] = useState(false), [shake, setShake] = useState(false), [busy, setBusy] = useState(false)
+  const [ob, setOb] = useState(0), [mode, setMode] = useState(() => api.RECOVERY_LINK ? 'reset' : api.LINK_EXPIRED ? 'forgot' : 'login')
+  const [form, setForm] = useState({ name: '', phone: '', id: '', pw: '', pw2: '' }), [showPw, setShowPw] = useState(false), [shake, setShake] = useState(false), [busy, setBusy] = useState(false)
   const [loc, setLoc] = useState(() => ({ city: 'Chattogram', area: '', line: '', ...readLS('ms_loc', {}) }))
   const [addr, setAddr] = useState(() => ({ name: '', phone: '', address: fullAddr(readLS('ms_loc', null)), note: '' }))
   const [pay, setPay] = useState(0), [promo, setPromo] = useState(''), [promoOn, setPromoOn] = useState(false)
@@ -646,7 +648,7 @@ export default function App() {
   const [np, setNp] = useState({ name: '', price: '', category_id: '', image_url: '' })
   const [wish, setWish] = useState(() => readLS('ms_wish', []))
   const [dir, setDir] = useState('fade'), [sort, setSort] = useState('pop'), [chip, setChip] = useState('All'), dq = useDeferredValue(q)
-  const toastT = useRef(0), wishPrev = useRef(null), wishUser = useRef(''), prodsR = useRef([])
+  const toastT = useRef(0), wishPrev = useRef(null), wishUser = useRef(''), prodsR = useRef([]), recov = useRef(!!api.RECOVERY_LINK)
 
   const cur = stack[stack.length - 1]
   const s = cur.s
@@ -686,7 +688,7 @@ export default function App() {
     window.addEventListener('popstate', h)
     return () => window.removeEventListener('popstate', h)
   }, [popOne])
-  const say = useCallback(m => { clearTimeout(toastT.current); setToast(m); toastT.current = setTimeout(() => setToast(''), 1800) }, [])
+  const say = useCallback((m, ms = 1800) => { clearTimeout(toastT.current); setToast(m); toastT.current = setTimeout(() => setToast(''), ms) }, [])
   const open = useCallback(p => go('product', { p }), [go])
   const like = useCallback(id => setWish(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]), [])
   const logout = useCallback(async () => { await safe(() => api.signOut()); setUser(null); tab('auth') }, [tab])
@@ -704,6 +706,15 @@ export default function App() {
   }, [say])
 
   useEffect(() => { load(); return () => clearTimeout(toastT.current) }, [load])
+  // Google / email-confirm redirects, password-recovery links, sign-out
+  useEffect(() => api.onAuthChange((u, ev) => {
+    if (ev === 'PASSWORD_RECOVERY') { recov.current = true; setMode('reset'); setStack([{ s: 'auth' }]); return }
+    if (!u) { setUser(null); return }
+    setUser(p => (p?.id === u.id && p.is_admin === u.is_admin ? p : u))
+    if (!recov.current) setStack(st => (['splash', 'ob', 'auth'].includes(st[st.length - 1].s) ? [{ s: 'home' }] : st))
+  }), [])
+  // use the name / phone given at registration to pre-fill delivery details
+  useEffect(() => { if (user?.id && user.id !== 'local') setAddr(a => ({ ...a, name: a.name || user.name || '', phone: a.phone || user.mobile || '' })) }, [user])
   // new / edited / hidden products and categories show up without a reload
   useEffect(() => {
     const sb = api.supabase; if (!sb) return
@@ -735,7 +746,7 @@ export default function App() {
   useEffect(() => {
     if (cur.s !== 'splash') return
     let on = true
-    Promise.all([safe(() => api.restoreUser()), new Promise(r => setTimeout(r, 1500))]).then(([u]) => { if (!on) return; if (u) setUser(u); tab(u || user ? 'home' : 'ob') })
+    Promise.all([safe(() => api.restoreUser()), new Promise(r => setTimeout(r, 1500))]).then(([u]) => { if (!on) return; if (recov.current || api.LINK_EXPIRED) return tab('auth'); if (u) setUser(u); tab(u || user ? 'home' : 'ob') })
     return () => { on = false }
   }, [])
   useEffect(() => { if (s === 'orders' || s === 'tracking') safe(() => api.getOrders(user?.id), null).then(o => { if (o) setOrders(o) }) }, [s, user])
@@ -785,10 +796,28 @@ export default function App() {
   const login = async e => {
     e?.preventDefault?.()
     if (busy) return
-    if (!form.id.trim() || form.pw.length < 4) return bad('Enter your details (password 4+ chars)')
+    const email = form.id.trim().toLowerCase(), name = form.name.trim(), phone = form.phone.replace(/[\s-]/g, '')
+    if (mode === 'signup' && name.length < 2) return bad('Enter your full name')
+    if (mode === 'signup' && !/^(?:\+?88)?01[3-9]\d{8}$/.test(phone)) return bad('Enter a valid phone number (01XXXXXXXXX)')
+    if (mode !== 'reset' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return bad('Enter a valid email address')
+    if (mode !== 'forgot' && form.pw.length < 6) return bad('Password must be at least 6 characters')
+    if ((mode === 'signup' || mode === 'reset') && form.pw !== form.pw2) return bad('Passwords do not match')
     setBusy(true)
-    try { const u = await api.signIn(form.id.trim(), form.pw, mode === 'signup'); setUser(u); tab('home') }
-    catch (err) { bad(err?.message || 'Could not sign in. Please try again.') }
+    try {
+      if (mode === 'forgot') { await api.resetPassword(email); say('Reset link sent. Check your email, including spam.', 4500); setMode('login') }
+      else if (mode === 'reset') {
+        await api.updatePassword(form.pw); recov.current = false
+        setForm(f => ({ ...f, pw: '', pw2: '' })); say('Password updated')
+        const u = await api.restoreUser(); if (u) setUser(u); setMode('login'); tab(u ? 'home' : 'auth')
+      }
+      else if (mode === 'signup') {
+        const r = await api.signUp({ name, phone, email, password: form.pw })
+        if (r?.needsConfirm) { say('Account created. Check your email to confirm it, then log in.', 5000); setMode('login') }
+        else { setUser(r); tab('home') }
+      }
+      else { const u = await api.signIn(email, form.pw); setUser(u); tab('home') }
+    }
+    catch (err) { bad(err?.message || 'Could not continue. Please try again.') }
     finally { setBusy(false) }
   }
   const applyPromo = () => promo.trim().toUpperCase() === 'SHIELD10' ? (setPromoOn(true), say('10% off applied')) : say('Invalid promo code')
@@ -849,16 +878,23 @@ export default function App() {
       <h1 className="lgcard"><img src="/logo-full.webp?v=2" width="220" height="197" alt="MyShield" decoding="async" /></h1>
       <p className="tag">Privacy. Confidence. Comfort. Wellness.</p>
       <form className={'auth-card glass' + (shake ? ' shake' : '')} onSubmit={login} noValidate>
-        <div className="tabs" data-i={mode === 'login' ? 0 : 1}>{['login', 'signup'].map(m => <button type="button" key={m} className={mode === m ? 'on' : ''} onClick={() => setMode(m)}>{m === 'login' ? 'Login' : 'Sign Up'}</button>)}</div>
-        <label className="fld"><span className="fi"><Icon n="phone" /></span><input placeholder="Phone number or Email" aria-label="Phone number or email" autoComplete="username" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck="false" enterKeyHint="next" value={form.id} onChange={e => setForm(f => ({ ...f, id: e.target.value }))} /></label>
-        <label className="fld"><span className="fi"><Icon n="lock" /></span><input placeholder="Password" aria-label="Password" type={showPw ? 'text' : 'password'} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} enterKeyHint="go" value={form.pw} onChange={e => setForm(f => ({ ...f, pw: e.target.value }))} />
-          <button type="button" className="eye" aria-label={showPw ? 'Hide password' : 'Show password'} onClick={() => setShowPw(v => !v)}><Icon n={showPw ? 'eyeoff' : 'eye'} /></button></label>
-        <div className="forgot"><button type="button" onClick={() => say('Password reset coming soon')}>Forgot password?</button></div>
-        <button className="btn" type="submit" disabled={busy}>{busy ? <i className="spin" /> : mode === 'login' ? 'Login' : 'Create Account'}</button>
-        <div className="or"><span>or continue with</span></div>
-        <div className="socials"><button type="button" className="btn o social" onClick={login}><GoogleG />Google</button><button type="button" className="btn o social" onClick={login}><AppleMark />Apple</button></div>
+        {(mode === 'login' || mode === 'signup') && <div className="tabs" data-i={mode === 'login' ? 0 : 1}>{['login', 'signup'].map(m => <button type="button" key={m} className={mode === m ? 'on' : ''} onClick={() => setMode(m)}>{m === 'login' ? 'Login' : 'Sign Up'}</button>)}</div>}
+        {mode === 'forgot' && <p className="msg"><b>Reset your password</b><br />Enter your account email and we will send you a reset link.</p>}
+        {mode === 'reset' && <p className="msg"><b>Set a new password</b><br />Choose a new password for your account.</p>}
+        {mode === 'signup' && <label className="fld"><span className="fi"><Icon n="user" /></span><input placeholder="Full name" aria-label="Full name" autoComplete="name" enterKeyHint="next" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></label>}
+        {mode === 'signup' && <label className="fld"><span className="fi"><Icon n="phone" /></span><input placeholder="Phone number (01XXXXXXXXX)" aria-label="Phone number" type="tel" inputMode="tel" autoComplete="tel" enterKeyHint="next" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} /></label>}
+        {mode !== 'reset' && <label className="fld"><span className="fi"><Icon n="mail" /></span><input placeholder="Email address" aria-label="Email address" type="email" autoComplete="username" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck="false" enterKeyHint={mode === 'forgot' ? 'go' : 'next'} value={form.id} onChange={e => setForm(f => ({ ...f, id: e.target.value }))} /></label>}
+        {mode !== 'forgot' && <label className="fld"><span className="fi"><Icon n="lock" /></span><input placeholder={mode === 'reset' ? 'New password' : 'Password'} aria-label="Password" type={showPw ? 'text' : 'password'} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} enterKeyHint={mode === 'login' ? 'go' : 'next'} value={form.pw} onChange={e => setForm(f => ({ ...f, pw: e.target.value }))} />
+          <button type="button" className="eye" aria-label={showPw ? 'Hide password' : 'Show password'} onClick={() => setShowPw(v => !v)}><Icon n={showPw ? 'eyeoff' : 'eye'} /></button></label>}
+        {(mode === 'signup' || mode === 'reset') && <label className="fld"><span className="fi"><Icon n="lock" /></span><input placeholder="Confirm password" aria-label="Confirm password" type={showPw ? 'text' : 'password'} autoComplete="new-password" enterKeyHint="go" value={form.pw2} onChange={e => setForm(f => ({ ...f, pw2: e.target.value }))} /></label>}
+        {mode === 'login' && <div className="forgot"><button type="button" onClick={() => setMode('forgot')}>Forgot password?</button></div>}
+        <button className="btn" type="submit" disabled={busy}>{busy ? <i className="spin" /> : { login: 'Login', signup: 'Create Account', forgot: 'Send Reset Link', reset: 'Update Password' }[mode]}</button>
+        {(mode === 'login' || mode === 'signup') && <>
+          <div className="or"><span>or continue with</span></div>
+          <div className="socials" style={{ gridTemplateColumns: '1fr' }}><button type="button" className="btn o social" onClick={() => api.signInWithGoogle().catch(e => bad(e?.message || 'Google login failed'))}><GoogleG />Google</button></div>
+        </>}
       </form>
-      <p className="sw">{mode === 'login' ? 'New here?' : 'Already have an account?'} <button type="button" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}>{mode === 'login' ? 'Create an account' : 'Login'}</button></p>
+      {mode !== 'reset' && <p className="sw">{mode === 'forgot' ? <>Remembered it? <button type="button" onClick={() => setMode('login')}>Back to login</button></> : <>{mode === 'login' ? 'New here?' : 'Already have an account?'} <button type="button" onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}>{mode === 'login' ? 'Create an account' : 'Login'}</button></>}</p>}
       <p className="trust"><Icon n="lock" />Private by design · Discreet delivery</p>
     </div></div>
 
