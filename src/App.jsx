@@ -364,10 +364,11 @@ function Money({ v }) {
 }
 
 function BannerImpl({ shop }) {
-  const [i, setI] = useState(0)
-  useEffect(() => { const t = setInterval(() => { if (!document.hidden) setI(x => (x + 1) % OFFERS.length) }, 3500); return () => clearInterval(t) }, [])
-  const o = OFFERS[i]
-  return <div className="bw"><div className="banner"><div key={i} className="bt"><span className="bchip">{o[0]}</span><h3>{o[1].split('|').map(l => <span key={l}>{l}</span>)}</h3><button className="bshop" onClick={() => shop('categories')}>Shop Now<i>↗</i></button></div><div key={'e' + i} className="be"><Glyph v={o[2]} /></div></div><div className="bd">{OFFERS.map((_, k) => <i key={k} className={k === i ? 'on' : ''} />)}</div></div>
+  const [list, setList] = useState(OFFERS), [i, setI] = useState(0)
+  useEffect(() => { let on = true; api.getHero().then(h => { if (on && h?.length) { setList(h.map(x => [x.chip || 'MyShield', x.lines, x.image || x.emoji || '🛡️'])); setI(0) } }).catch(() => {}); return () => { on = false } }, [])
+  useEffect(() => { if (list.length < 2) return; const t = setInterval(() => { if (!document.hidden) setI(x => (x + 1) % list.length) }, 3500); return () => clearInterval(t) }, [list])
+  const o = list[i % list.length]
+  return <div className="bw"><div className="banner"><div key={i} className="bt"><span className="bchip">{o[0]}</span><h3>{o[1].split('|').map((l, k) => <span key={k}>{l}</span>)}</h3><button className="bshop" onClick={() => shop('categories')}>Shop Now<i>↗</i></button></div><div key={'e' + i} className="be"><Glyph v={o[2]} /></div></div><div className="bd">{list.map((_, k) => <i key={k} className={k === i % list.length ? 'on' : ''} />)}</div></div>
 }
 
 const Banner = memo(BannerImpl)
