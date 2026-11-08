@@ -704,6 +704,14 @@ export default function App() {
   }, [say])
 
   useEffect(() => { load(); return () => clearTimeout(toastT.current) }, [load])
+  // new / edited / hidden products and categories show up without a reload
+  useEffect(() => {
+    const sb = api.supabase; if (!sb) return
+    let t; const soon = () => { clearTimeout(t); t = setTimeout(load, 400) }, vis = () => { if (!document.hidden) soon() }
+    const ch = sb.channel('store-live').on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, soon).on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, soon).subscribe()
+    document.addEventListener('visibilitychange', vis); const poll = setInterval(vis, 30000)
+    return () => { clearTimeout(t); clearInterval(poll); document.removeEventListener('visibilitychange', vis); sb.removeChannel(ch) }
+  }, [load])
   useEffect(() => { const t = setTimeout(() => writeLS('ms_cart', cart), 250); return () => clearTimeout(t) }, [cart])
   useEffect(() => { const t = setTimeout(() => writeLS('ms_wish', wish), 250); return () => clearTimeout(t) }, [wish])
   prodsR.current = prods
@@ -798,7 +806,7 @@ export default function App() {
     } catch { say('Could not place order. Please try again.') }
     finally { setBusy(false) }
   }
-  const adminDo = async (fn, ok) => { if (!admin) return; try { await fn(); await load(); say(ok) } catch { say('Something went wrong. Try again.') } }
+  const adminDo = async (fn, ok) => { if (!admin) return; try { await fn(); await load(); say(ok) } catch (e) { say(e?.message || 'Something went wrong. Try again.') } }
 
   let body
   if (s === 'splash') return <div className="app"><div className="splash"><div className="lgcard"><img src="/logo-full.webp?v=2" width="220" height="197" alt="MyShield" fetchpriority="high" decoding="async" /></div><div>Privacy. Confidence. Comfort. Wellness.</div><div className="sbar"><i /></div></div></div>
