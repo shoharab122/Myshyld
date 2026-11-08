@@ -184,14 +184,15 @@ function Products({ d, reload, say }) {
   const cn = useMemo(() => Object.fromEntries(d.cats.map(c => [c.id, c.name])), [d.cats])
   const list = useMemo(() => d.products.filter(p => (!cf || p.category_id === cf) && (!q || `${p.name} ${p.brand || ''}`.toLowerCase().includes(q.toLowerCase()))), [d.products, q, cf])
   const edit = p => setE(p ? { ...blank, ...p, stock: p.stock ?? '', emoji: p.emoji || '', brand: p.brand || '', tag: p.tag || '', image_url: p.image_url || '', is_active: p.is_active !== false, variants: p.variants?.length ? p.variants : blank.variants, features: (p.features || []).join('\n') } : { ...blank, category_id: d.cats[0]?.id || '' })
-  const toggle = async p => { const { error } = await sb.from('products').update({ is_active: p.is_active === false }).eq('id', p.id); error ? say(error.message) : reload() }
-  const del = async p => { if (!window.confirm(`Delete "${p.name}"? This cannot be undone.`)) return; const { error } = await sb.from('products').delete().eq('id', p.id); error ? say(error.message) : (say('Product deleted'), reload()) }
+  const toggle = async p => { const { data, error } = await sb.from('products').update({ is_active: p.is_active === false }).eq('id', p.id).select(); if (error) return say(error.message); if (!data?.length) return say('Not saved. This account may not have permission to edit products.'); reload() }
+  const del = async p => { if (!window.confirm(`Delete "${p.name}"? This cannot be undone.`)) return; const { data, error } = await sb.from('products').delete().eq('id', p.id).select(); if (error) return say(error.message); if (!data?.length) return say('Not deleted. This account may not have permission to delete products.'); say('Product deleted'); reload() }
   const save = async () => {
     if (!e.name.trim() || !e.category_id || !(+e.price > 0)) return say('Name, category and a price above 0 are required')
     const v = e.variants.filter(x => x.label.trim()).map(x => ({ label: x.label.trim(), mult: +x.mult || 1 }))
     const row = { name: e.name.trim(), brand: e.brand.trim() || null, tag: e.tag.trim() || null, category_id: e.category_id, price: +e.price, stock: e.stock === '' ? null : Math.max(0, +e.stock), emoji: e.emoji || null, image_url: e.image_url || null, is_active: e.is_active, variants: v.length ? v : blank.variants, features: e.features.split('\n').map(s => s.trim()).filter(Boolean), ...(e.id ? {} : { rating: 4.5, reviews: 0 }) }
-    setBusy(true); const { error } = await (e.id ? sb.from('products').update(row).eq('id', e.id) : sb.from('products').insert(row)); setBusy(false)
-    if (error) return say(error.message); say(e.id ? 'Product saved' : 'Product added'); setE(null); reload()
+    setBusy(true); const { data, error } = await (e.id ? sb.from('products').update(row).eq('id', e.id).select() : sb.from('products').insert(row).select()); setBusy(false)
+    if (error) return say(error.message); if (!data?.length) return say('Not saved. This account may not have permission to change products.')
+    say(e.id ? 'Product saved' : 'Product added. It is live in the store.'); setE(null); reload()
   }
   const s = (k, v) => setE(x => ({ ...x, [k]: v })), sv = (i, k, v) => setE(x => ({ ...x, variants: x.variants.map((y, j) => j === i ? { ...y, [k]: v } : y) }))
   return <div className="pg"><div className="tl"><input className="in" placeholder="Search products" value={q} onChange={e => setQ(e.target.value)} /><select className="in" value={cf} onChange={e => setCf(e.target.value)}><option value="">All categories</option>{d.cats.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select><button className="bt" onClick={() => edit()} disabled={!d.cats.length} title={d.cats.length ? '' : 'Add a category first'}>Add product</button></div>
