@@ -62,6 +62,6 @@ export async function getHero() {
   try {
     const { data } = await supabase.from('site_settings').select('value').eq('key', 'hero').maybeSingle()
     const s = (data?.value?.slides || []).filter(x => x.on !== false && (x.lines || '').trim())
-    return s.length ? s.map(x => ({ lines: x.lines.split('\n').filter(Boolean).join('|'), emoji: x.emoji, image: x.image })) : null
+    return s.length ? s.map(x => ({ lines: x.lines.split('\n').filter(Boolean).join('|'), chip: x.chip, emoji: x.emoji, image: x.image })) : null
   } catch { return null }
 }
