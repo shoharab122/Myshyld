@@ -1,0 +1,5 @@
+[functions.pay-create]
+verify_jwt = false
+
+[functions.pay-callback]
+verify_jwt = false

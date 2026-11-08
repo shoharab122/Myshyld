@@ -794,6 +794,13 @@ export default function App() {
   const applyPromo = () => promo.trim().toUpperCase() === 'SHIELD10' ? (setPromoOn(true), say('10% off applied')) : say('Invalid promo code')
   const place = async () => {
     if (busy) return
+    if (pay === 1 || pay === 2) { // bKash / Nagad: order is created + priced on the server, then we hand off to the gateway
+      if (!realUid(user) || !api.supabase) return say('Please sign in with your email to pay with ' + PAYS[pay][0])
+      setBusy(true)
+      try { location.assign(await api.startOnlinePayment({ provider: pay === 1 ? 'bkash' : 'nagad', items: cart, promo: promoOn ? 'SHIELD10' : '', address: addr })) }
+      catch (e) { say(e?.message || 'Could not start payment. Please try again.'); setBusy(false) }
+      return
+    }
     setBusy(true)
     try {
       const o = await api.placeOrder({ user_id: user?.id, items: cart, total, address: addr, payment: PAYS[pay][0] })
@@ -806,6 +813,25 @@ export default function App() {
     } catch { say('Could not place order. Please try again.') }
     finally { setBusy(false) }
   }
+  // Coming back from bKash / Nagad: trust only the database (the order must really be marked paid by the server)
+  useEffect(() => {
+    const unstick = e => { if (e.persisted) setBusy(false) }
+    window.addEventListener('pageshow', unstick)
+    const qs = new URLSearchParams(location.search), res = qs.get('pay'), no = qs.get('order')
+    if (res) {
+      try { history.replaceState(null, '', location.pathname) } catch { /* ignore */ }
+      if (no) (async () => {
+        const o = await api.getOrderByNo(no)
+        if (o?.payment_status === 'paid') {
+          setCart([]); setPromoOn(false); depth.current = 1
+          try { history.pushState({ ms: 1 }, '') } catch { /* history blocked */ }
+          setDir('fwd'); setStack([{ s: 'home' }, { s: 'done', order: o }])
+        } else say(res === 'cancel' ? 'Payment cancelled. Your cart is still saved.' : 'Payment was not completed. You have not been charged. Please try again.')
+      })()
+      else say('Payment was not completed. Please try again.')
+    }
+    return () => window.removeEventListener('pageshow', unstick)
+  }, [say])
   const adminDo = async (fn, ok) => { if (!admin) return; try { await fn(); await load(); say(ok) } catch (e) { say(e?.message || 'Something went wrong. Try again.') } }
 
   let body
@@ -871,7 +897,7 @@ export default function App() {
   if (s === 'payment') body = <><Hdr title="Payment Method" back={back} /><div className="scr narrow"><Steps n={2} /><div className="mini"><span>{count} item{count === 1 ? '' : 's'} · Free delivery</span><b><Money v={total} /></b></div>
     {PAYS.map(([n, d], k) => <button key={n} className={'pay' + (pay === k ? ' on' : '')} onClick={() => setPay(k)}><PayLogo k={k} /><div><b>{n}</b><small>{d}</small></div><i /></button>)}
     <div className="note" style={{ background: '#eaf8efcc', color: '#2a8a52' }}>🛡️ SSL Secured Payment — your information is always protected.</div>
-    <button className="btn" disabled={busy} onClick={place}>{busy ? <i className="spin" /> : <>Place Order · <Money v={total} /></>}</button></div></>
+    <button className="btn" disabled={busy} onClick={place}>{busy ? <i className="spin" /> : <>{pay === 1 || pay === 2 ? 'Pay Now' : 'Place Order'} · <Money v={total} /></>}</button></div></>
 
   if (s === 'done') body = <div className="scr ok narrow"><div className="tick">✓</div><h2 style={{ margin: '24px 0 4px' }}>Order Placed Successfully!</h2><div className="pill">Order #{cur.order.order_no}</div>
     <p style={{ color: '#8b8197', marginBottom: 30 }}>Thank you for choosing MyShield.<br />Your order will be delivered soon.</p>

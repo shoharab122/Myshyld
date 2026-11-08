@@ -77,7 +77,7 @@ function Shell({ user }) {
   const say = useCallback(m => { setToast(m); clearTimeout(tt.current); tt.current = setTimeout(() => setToast(''), 2400) }, [])
   const go = t => { setTab(t); history.replaceState(null, '', '#' + t); scrollTo(0, 0) }
   const load = useCallback(async () => {
-    const [o, p, c, w] = await Promise.all([sb.from('orders').select('*').order('created_at', { ascending: false }).limit(500), sb.from('products').select('*').order('created_at', { ascending: false }), sb.from('categories').select('*').order('created_at'), sb.from('wishlists').select('*').order('created_at', { ascending: false }).limit(1000)])
+    const [o, p, c, w] = await Promise.all([sb.from('orders').select('*').in('payment_status', ['unpaid', 'paid']).order('created_at', { ascending: false }).limit(500), sb.from('products').select('*').order('created_at', { ascending: false }), sb.from('categories').select('*').order('created_at'), sb.from('wishlists').select('*').order('created_at', { ascending: false }).limit(1000)])
     const er = o.error || p.error || c.error; if (er) say(er.message)
     setD({ orders: o.data || [], products: p.data || [], cats: c.data || [], wish: w.data || [], wishErr: !!w.error }); setLd(false)
   }, [say])
@@ -143,7 +143,7 @@ function Orders({ d: { orders }, reload, say }) {
         <button className="ob-main" onClick={() => setSel(o.id)}>
           <span className="av">{ini(o.address?.name)}</span>
           <span className="g1"><b>{o.address?.name || 'Customer'} {st === 0 && <i className="nw">NEW</i>}</b><small>#{o.order_no} · {ago(o.created_at)}</small><span className="its">{its.map(i => `${i.name}${i.qty > 1 ? ' ×' + i.qty : ''}`).join(', ') || 'No items'}</span></span>
-          <span className="rt"><b>{taka(o.total)}</b><small>{n} item{n === 1 ? '' : 's'} · {o.payment}</small><span className={'pl s' + st}>{STEPS[st]}</span></span>
+          <span className="rt"><b>{taka(o.total)}</b><small>{n} item{n === 1 ? '' : 's'} · {o.payment}{o.payment_status === 'paid' ? ' ✓ Paid' : ''}</small><span className={'pl s' + st}>{STEPS[st]}</span></span>
         </button>
         {st < 3 ? <div className="oa"><small>📍 {o.address?.address || 'No address'}</small><button className="bt sm" disabled={busy} onClick={() => setStatus(o, st + 1)}>{NEXT[st]} →</button></div> : <div className="oa"><small>📍 {o.address?.address || 'No address'}</small><span className="ok">✓ Completed</span></div>}
       </article>

@@ -59,3 +59,27 @@ export async function getHero() {
     return s.length ? s.map(x => ({ lines: x.lines.split('\n').filter(Boolean).join('|'), chip: x.chip, emoji: x.emoji, image: x.image })) : null
   } catch { return null }
 }
+
+// Online payments (bKash / Nagad). The server prices the cart from the database and talks to the gateway;
+// the browser only receives a payment-page URL to redirect to.
+export async function startOnlinePayment({ provider, items, promo, address }) {
+  if (!supabase) throw new Error('Online payment is unavailable right now.')
+  const { data, error } = await supabase.functions.invoke('pay-create', {
+    body: { provider, promo, address, items: items.map(i => ({ id: i.id, variant: i.variant, qty: i.qty })) },
+  })
+  if (error) {
+    let msg = ''
+    try { msg = (await error.context.json()).error } catch { /* not JSON */ }
+    throw new Error(msg || 'Could not start payment. Please try again.')
+  }
+  if (!data?.url) throw new Error('Could not start payment. Please try again.')
+  return data.url
+}
+export async function getOrderByNo(no) {
+  if (!supabase) return null
+  try {
+    await supabase.auth.getSession()
+    const { data } = await supabase.from('orders').select('*').eq('order_no', no).maybeSingle()
+    return data || null
+  } catch { return null }
+}
