@@ -73,7 +73,7 @@ function Login() {
 }
 
 function Shell({ user }) {
-  const [tab, setTab] = useState(() => location.hash.slice(1) || 'dash'), [d, setD] = useState({ orders: [], products: [], cats: [], wish: [], wishErr: false }), [toast, setToast] = useState(''), [ld, setLd] = useState(true), tt = useRef(0)
+  const [tab, setTab] = useState(() => { const h = location.hash.slice(1); return NAV.some(n => n[0] === h) ? h : 'dash' }), [d, setD] = useState({ orders: [], products: [], cats: [], wish: [], wishErr: false }), [toast, setToast] = useState(''), [ld, setLd] = useState(true), tt = useRef(0)
   const say = useCallback(m => { setToast(m); clearTimeout(tt.current); tt.current = setTimeout(() => setToast(''), 2400) }, [])
   const go = t => { setTab(t); history.replaceState(null, '', '#' + t); scrollTo(0, 0) }
   const load = useCallback(async () => {
@@ -92,7 +92,7 @@ function Shell({ user }) {
   return <div className="adm"><nav className="sb"><div className="brand"><span className="bm"><img src="/logo-mark.webp?v=2" width="26" height="22" alt="" decoding="async" /></span>My<b>Shield</b><small>Admin</small></div>
     {NAV.map(([k, l, i]) => <button key={k} className={tab === k ? 'on' : ''} aria-current={tab === k ? 'page' : undefined} onClick={() => go(k)}><span aria-hidden="true">{i}</span>{l}{k === 'orders' && pend > 0 && <em>{pend}</em>}</button>)}<div className="sp" /><small className="who">{user.email}</small></nav>
     <main className="mn"><header className="top"><h1>{title}</h1><div><button className="bt g sm" onClick={load}>Refresh</button><button className="bt g sm" onClick={() => sb.auth.signOut()}>Sign out</button></div></header>
-      {ld ? <div className="ctr"><i className="spin" /></div> : tab === 'dash' ? <Dash {...p} /> : tab === 'orders' ? <Orders {...p} /> : tab === 'wish' ? <Wish {...p} /> : tab === 'products' ? <Products {...p} /> : tab === 'cats' ? <Cats {...p} /> : <Hero say={say} />}</main>
+      {ld ? <div className="ctr"><i className="spin" /></div> : tab === 'dash' ? <Dash {...p} /> : tab === 'orders' ? <Orders {...p} /> : tab === 'wish' ? <Wish {...p} /> : tab === 'products' ? <Products {...p} /> : tab === 'cats' ? <Cats {...p} /> : tab === 'hero' ? <Hero say={say} /> : <Dash {...p} />}</main>
     {toast && <div className="toast" role="status">{toast}</div>}</div>
 }
 
@@ -151,11 +151,11 @@ function Orders({ d: { orders }, reload, say }) {
     {cur && <Modal title={'Order #' + cur.order_no} onClose={() => setSel(null)}>
       <div className="steps">{STEPS.map((s, i) => <button key={s} disabled={busy} className={(cur.status || 0) === i ? 'on' : (cur.status || 0) > i ? 'dn' : ''} onClick={() => setStatus(cur, i)}>{(cur.status || 0) > i ? '✓ ' : ''}{s}</button>)}</div>
       <div className="cu"><span className="av lg">{ini(cur.address?.name)}</span><span className="g1"><b>{cur.address?.name}</b><small>{cur.address?.phone}</small></span><span className={'pl s' + (cur.status || 0)}>{STEPS[cur.status || 0]}</span></div>
-      <div className="acts"><a className="bt sm" href={'tel:' + cur.address?.phone}>📞 Call</a><a className="bt g sm" href={wa(cur.address?.phone)} target="_blank" rel="noopener noreferrer">💬 WhatsApp</a><button className="bt g sm" onClick={() => print()}>🖨 Print</button></div>
+      <div className="acts"><a className="bt sm" href={cur.address?.phone ? 'tel:' + cur.address.phone : undefined}>📞 Call</a><a className="bt g sm" href={wa(cur.address?.phone)} target="_blank" rel="noopener noreferrer">💬 WhatsApp</a><button className="bt g sm" onClick={() => print()}>🖨 Print</button></div>
       <h3>Delivery address</h3>
       <div className="cd ad"><p>{cur.address?.address || '—'}</p>{cur.address?.note && <p className="mut">Note: {cur.address.note}</p>}<button className="bt g sm" onClick={() => { navigator.clipboard?.writeText(cur.address?.address || '').then(() => say('Address copied'), () => say('Could not copy')) }}>Copy address</button></div>
       <h3>Items</h3>
-      {(cur.items || []).map(i => <div className="ln it" key={i.key}><span className="th">{i.image_url ? <img src={i.image_url} alt="" loading="lazy" /> : i.emoji || '🛍️'}</span><span className="g1"><b>{i.name}</b><small>{i.variant ? i.variant + ' · ' : ''}{taka(i.price)} × {i.qty}</small></span><b>{taka(i.price * i.qty)}</b></div>)}
+      {(cur.items || []).map((i, ix) => <div className="ln it" key={i.key || ix}><span className="th">{i.image_url ? <img src={i.image_url} alt="" loading="lazy" /> : i.emoji || '🛍️'}</span><span className="g1"><b>{i.name}</b><small>{i.variant ? i.variant + ' · ' : ''}{taka(i.price)} × {i.qty}</small></span><b>{taka(i.price * i.qty)}</b></div>)}
       <div className="sm2"><div><span>Subtotal</span><span>{taka(sub)}</span></div>{sub - cur.total > 0.5 && <div><span>Discount</span><span className="ok">−{taka(sub - cur.total)}</span></div>}<div><span>Payment</span><span>{cur.payment}</span></div><div className="tt"><span>Total</span><span>{taka(cur.total)}</span></div></div>
       <p className="mut">Placed {fmt(cur.created_at)} · {ago(cur.created_at)}</p>
       {(cur.status || 0) < 3 && <button className="bt" disabled={busy} onClick={() => setStatus(cur, (cur.status || 0) + 1)}>{NEXT[cur.status || 0]} →</button>}
@@ -189,7 +189,7 @@ function Products({ d, reload, say }) {
   const save = async () => {
     if (!e.name.trim() || !e.category_id || !(+e.price > 0)) return say('Name, category and a price above 0 are required')
     const v = e.variants.filter(x => x.label.trim()).map(x => ({ label: x.label.trim(), mult: +x.mult || 1 }))
-    const row = { name: e.name.trim(), brand: e.brand.trim() || null, tag: e.tag.trim() || null, category_id: e.category_id, price: +e.price, stock: e.stock === '' ? null : Math.max(0, +e.stock), emoji: e.emoji || null, image_url: e.image_url || null, is_active: e.is_active, variants: v.length ? v : blank.variants, features: e.features.split('\n').map(s => s.trim()).filter(Boolean) }
+    const row = { name: e.name.trim(), brand: e.brand.trim() || null, tag: e.tag.trim() || null, category_id: e.category_id, price: +e.price, stock: e.stock === '' ? null : Math.max(0, +e.stock), emoji: e.emoji || null, image_url: e.image_url || null, is_active: e.is_active, variants: v.length ? v : blank.variants, features: e.features.split('\n').map(s => s.trim()).filter(Boolean), ...(e.id ? {} : { rating: 4.5, reviews: 0 }) }
     setBusy(true); const { error } = await (e.id ? sb.from('products').update(row).eq('id', e.id) : sb.from('products').insert(row)); setBusy(false)
     if (error) return say(error.message); say(e.id ? 'Product saved' : 'Product added'); setE(null); reload()
   }
@@ -201,7 +201,7 @@ function Products({ d, reload, say }) {
       <div className="fg"><F l="Name"><input className="in" value={e.name} onChange={x => s('name', x.target.value)} /></F><F l="Category"><select className="in" value={e.category_id} onChange={x => s('category_id', x.target.value)}>{d.cats.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></F>
         <F l="Base price (৳)"><input className="in" type="number" min="0" inputMode="decimal" value={e.price} onChange={x => s('price', x.target.value)} /></F><F l="Stock (blank = unlimited)"><input className="in" type="number" min="0" inputMode="numeric" value={e.stock} onChange={x => s('stock', x.target.value)} /></F>
         <F l="Brand"><input className="in" value={e.brand} onChange={x => s('brand', x.target.value)} /></F><F l="Label (e.g. Thin, Flavoured)"><input className="in" value={e.tag} onChange={x => s('tag', x.target.value)} /></F></div>
-      <h3>Image</h3><Img value={e.image_url} folder="products" say={say} onChange={v => s('image_url', v)} /><F l="Emoji shown when there is no image"><input className="in sm" maxLength="4" value={e.emoji} onChange={x => s('emoji', x.target.value)} /></F>
+      <h3>Image</h3><Img value={e.image_url} folder="products" say={say} onChange={v => s('image_url', v)} /><F l="Emoji shown when there is no image"><input className="in sm" maxLength={8} value={e.emoji} onChange={x => s('emoji', x.target.value)} /></F>
       <h3>Variants</h3>{e.variants.map((v, i) => <div className="vr" key={i}><input className="in" aria-label="Variant name" placeholder="e.g. 10 pcs" value={v.label} onChange={x => sv(i, 'label', x.target.value)} /><input className="in" aria-label="Price multiplier" type="number" step="0.05" min="0" value={v.mult} onChange={x => sv(i, 'mult', x.target.value)} /><b>{taka(+e.price * (+v.mult || 1))}</b><button className="bt d sm" aria-label="Remove variant" onClick={() => setE(x => ({ ...x, variants: x.variants.filter((_, j) => j !== i) }))}>✕</button></div>)}
       <button className="bt g sm" onClick={() => setE(x => ({ ...x, variants: [...x.variants, { label: '', mult: 1 }] }))}>Add variant</button>
       <F l="Features (one per line)"><textarea className="in" rows="4" value={e.features} onChange={x => s('features', x.target.value)} /></F>
@@ -212,24 +212,53 @@ function Products({ d, reload, say }) {
 function Cats({ d, reload, say }) {
   const [n, setN] = useState({ name: '', icon: '🛍️' }), [e, setE] = useState(null)
   const cnt = useMemo(() => { const m = {}; d.products.forEach(p => { m[p.category_id] = (m[p.category_id] || 0) + 1 }); return m }, [d.products])
-  const run = async (q, ok) => { const { error } = await q; if (error) return say(error.message); say(ok); reload() }
-  const add = async () => { if (!n.name.trim()) return say('Enter a category name'); await run(sb.from('categories').insert({ name: n.name.trim(), icon: n.icon || '🛍️' }), 'Category added'); setN({ name: '', icon: '🛍️' }) }
+  const run = async (q, ok) => { const { error } = await q; if (error) { say(error.message); return false } say(ok); reload(); return true }
+  const add = async () => { if (!n.name.trim()) return say('Enter a category name'); if (await run(sb.from('categories').insert({ name: n.name.trim(), icon: n.icon || '🛍️' }), 'Category added')) setN({ name: '', icon: '🛍️' }) }
   const del = c => window.confirm(cnt[c.id] ? `Delete "${c.name}" and its ${cnt[c.id]} products? This cannot be undone.` : `Delete "${c.name}"?`) && run(sb.from('categories').delete().eq('id', c.id), 'Category deleted')
-  return <div className="pg"><div className="cd"><h2>Add category</h2><div className="tl"><input className="in ic" aria-label="Icon" maxLength="4" value={n.icon} onChange={x => setN({ ...n, icon: x.target.value })} /><input className="in" placeholder="e.g. Lubricants" value={n.name} onChange={x => setN({ ...n, name: x.target.value })} /><button className="bt" onClick={add}>Add category</button></div></div>
-    <div className="cd lst">{d.cats.map(c => <div className="rw" key={c.id}>{e?.id === c.id ? <><input className="in ic" aria-label="Icon" value={e.icon} onChange={x => setE({ ...e, icon: x.target.value })} /><input className="in g1" aria-label="Name" value={e.name} onChange={x => setE({ ...e, name: x.target.value })} /><button className="bt sm" onClick={async () => { await run(sb.from('categories').update({ name: e.name.trim(), icon: e.icon }).eq('id', c.id), 'Category saved'); setE(null) }}>Save</button><button className="bt g sm" onClick={() => setE(null)}>Cancel</button></> : <><span className="th">{c.icon}</span><span className="g1"><b>{c.name}</b><small>{cnt[c.id] || 0} products</small></span><button className="bt g sm" onClick={() => setE({ ...c })}>Edit</button><button className="bt d sm" aria-label={'Delete ' + c.name} onClick={() => del(c)}>Delete</button></>}</div>)}{!d.cats.length && <p className="mut pad">No categories yet.</p>}</div></div>
+  return <div className="pg"><div className="cd"><h2>Add category</h2><div className="tl"><input className="in ic" aria-label="Icon" maxLength={8} value={n.icon} onChange={x => setN({ ...n, icon: x.target.value })} /><input className="in" placeholder="e.g. Lubricants" value={n.name} onChange={x => setN({ ...n, name: x.target.value })} /><button className="bt" onClick={add}>Add category</button></div></div>
+    <div className="cd lst">{d.cats.map(c => <div className="rw" key={c.id}>{e?.id === c.id ? <><input className="in ic" aria-label="Icon" value={e.icon} onChange={x => setE({ ...e, icon: x.target.value })} /><input className="in g1" aria-label="Name" value={e.name} onChange={x => setE({ ...e, name: x.target.value })} /><button className="bt sm" onClick={async () => { if (!e.name.trim()) return say('Enter a category name'); if (await run(sb.from('categories').update({ name: e.name.trim(), icon: e.icon || '🛍️' }).eq('id', c.id), 'Category saved')) setE(null) }}>Save</button><button className="bt g sm" onClick={() => setE(null)}>Cancel</button></> : <><span className="th">{c.icon}</span><span className="g1"><b>{c.name}</b><small>{cnt[c.id] || 0} products</small></span><button className="bt g sm" onClick={() => setE({ ...c })}>Edit</button><button className="bt d sm" aria-label={'Delete ' + c.name} onClick={() => del(c)}>Delete</button></>}</div>)}{!d.cats.length && <p className="mut pad">No categories yet.</p>}</div></div>
 }
 
-const DEF = [{ lines: 'Privacy.\nConfidence.\nComfort.\nWellness.', emoji: '🛡️', image: '', on: true }, { lines: 'Free discreet\ndelivery across\nChattogram', emoji: '🚚', image: '', on: true }, { lines: 'Use code\nSHIELD10\nfor 10% off', emoji: '🎁', image: '', on: true }]
+const DEF = [{ chip: 'Limited Offer', lines: 'Privacy. Confidence.\nComfort. Wellness.', emoji: '🛡️', image: '', on: true }, { chip: 'Free Delivery', lines: 'Discreet delivery\nacross Chattogram', emoji: '🚚', image: '', on: true }, { chip: 'Use code SHIELD10', lines: 'Get 10% off\nyour first order', emoji: '🎁', image: '', on: true }]
+const isLogo = v => v === '🛡️' || v === '🛡'
 function Hero({ say }) {
-  const [s, setS] = useState(null), [busy, setBusy] = useState(false)
-  useEffect(() => { sb.from('site_settings').select('value').eq('key', 'hero').maybeSingle().then(({ data }) => setS(data?.value?.slides?.length ? data.value.slides : DEF)) }, [])
+  const [s, setS] = useState(null), [busy, setBusy] = useState(false), [dirty, setDirty] = useState(false)
+  useEffect(() => {
+    let live = true
+    sb.from('site_settings').select('value').eq('key', 'hero').maybeSingle().then(({ data, error }) => {
+      if (!live) return
+      if (error) say(error.message)
+      const v = data?.value?.slides
+      setS(Array.isArray(v) && v.length ? v.map(x => ({ chip: '', lines: '', emoji: '', image: '', on: true, ...x })) : DEF)
+    })
+    return () => { live = false }
+  }, [say])
+  useEffect(() => {
+    if (!dirty) return
+    const h = e => { e.preventDefault(); e.returnValue = '' }
+    addEventListener('beforeunload', h); return () => removeEventListener('beforeunload', h)
+  }, [dirty])
   if (!s) return <div className="ctr"><i className="spin" /></div>
-  const set = (i, k, v) => setS(a => a.map((x, j) => j === i ? { ...x, [k]: v } : x))
-  const mv = (i, d) => setS(a => { const b = [...a], j = i + d; if (j < 0 || j >= b.length) return a; [b[i], b[j]] = [b[j], b[i]]; return b })
-  const save = async () => { setBusy(true); const { error } = await sb.from('site_settings').upsert({ key: 'hero', value: { slides: s }, updated_at: new Date().toISOString() }); setBusy(false); error ? say(error.message) : say('Hero saved. It is live on the storefront.') }
-  return <div className="pg"><p className="mut">The slides on the storefront home banner. Customers see active slides in this order.</p>
-    {s.map((x, i) => <div className="cd hs" key={i}><div className="pv"><div>{x.lines.split('\n').map((l, k) => <span key={k}>{l}</span>)}</div><i>{x.image ? <img src={x.image} alt="" /> : x.emoji}</i></div>
-      <div><F l="Text (one line per row)"><textarea className="in" rows="3" value={x.lines} onChange={e => set(i, 'lines', e.target.value)} /></F><F l="Emoji"><input className="in sm" maxLength="4" value={x.emoji} onChange={e => set(i, 'emoji', e.target.value)} /></F><Img value={x.image} folder="hero" say={say} onChange={v => set(i, 'image', v)} />
-        <div className="acts"><label className="ck"><input type="checkbox" checked={x.on !== false} onChange={e => set(i, 'on', e.target.checked)} /> Show</label><button className="bt g sm" disabled={!i} onClick={() => mv(i, -1)}>Move up</button><button className="bt g sm" disabled={i === s.length - 1} onClick={() => mv(i, 1)}>Move down</button><button className="bt d sm" onClick={() => setS(a => a.filter((_, j) => j !== i))}>Delete</button></div></div></div>)}
-    <div className="acts"><button className="bt g" onClick={() => setS(a => [...a, { lines: '', emoji: '✨', image: '', on: true }])}>Add slide</button><button className="bt" disabled={busy} onClick={save}>{busy ? 'Saving…' : 'Save hero'}</button></div></div>
+  const upd = fn => { setS(fn); setDirty(true) }
+  const set = (i, k, v) => upd(a => a.map((x, j) => j === i ? { ...x, [k]: v } : x))
+  const mv = (i, d) => upd(a => { const b = [...a], j = i + d; if (j < 0 || j >= b.length) return a;[b[i], b[j]] = [b[j], b[i]]; return b })
+  const save = async () => {
+    const bad = s.findIndex(x => x.on !== false && !(x.lines || '').trim())
+    if (bad >= 0) return say(`Slide ${bad + 1} is shown but has no text. Add text, hide it or delete it.`)
+    if (!s.some(x => x.on !== false)) return say('Show at least one slide, or the store uses its default banner.')
+    const slides = s.map(x => ({ chip: (x.chip || '').trim(), lines: (x.lines || '').split('\n').map(l => l.trim()).filter(Boolean).join('\n'), emoji: (x.emoji || '').trim(), image: x.image || '', on: x.on !== false }))
+    setBusy(true)
+    const { error } = await sb.from('site_settings').upsert({ key: 'hero', value: { slides }, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+    setBusy(false)
+    if (error) return say(error.message)
+    setS(slides); setDirty(false); say('Hero saved. It is live on the storefront.')
+  }
+  return <div className="pg"><p className="mut">The slides on the storefront home banner. Customers see slides marked Show, in this order. {dirty && <b className="wn">Unsaved changes</b>}</p>
+    {s.map((x, i) => <div className="cd hs" key={i}><div className="pv"><div>{x.chip && <span style={{ fontSize: '.7rem', opacity: .85, letterSpacing: '.08em', textTransform: 'uppercase' }}>{x.chip}</span>}{(x.lines || '').split('\n').filter(Boolean).map((l, k) => <span key={k}>{l}</span>)}</div><i>{x.image ? <img src={x.image} alt="" /> : isLogo(x.emoji) ? <img src="/logo-mark.webp?v=2" alt="" /> : x.emoji}</i></div>
+      <div><F l="Text (one line per row)"><textarea className="in" rows="3" value={x.lines} onChange={e => set(i, 'lines', e.target.value)} /></F>
+        <div className="fg"><F l="Badge (small label above the text)"><input className="in" maxLength={30} value={x.chip} onChange={e => set(i, 'chip', e.target.value)} /></F><F l="Emoji (used when there is no image)"><input className="in sm" maxLength={8} value={x.emoji} onChange={e => set(i, 'emoji', e.target.value)} /></F></div>
+        <Img value={x.image} folder="hero" say={say} onChange={v => set(i, 'image', v)} />
+        <div className="acts"><label className="ck"><input type="checkbox" checked={x.on !== false} onChange={e => set(i, 'on', e.target.checked)} /> Show</label><button className="bt g sm" disabled={!i} onClick={() => mv(i, -1)}>Move up</button><button className="bt g sm" disabled={i === s.length - 1} onClick={() => mv(i, 1)}>Move down</button><button className="bt d sm" onClick={() => { if (window.confirm(`Delete slide ${i + 1}?`)) upd(a => a.filter((_, j) => j !== i)) }}>Delete</button></div></div></div>)}
+    {!s.length && <p className="mut cd">No slides. Add one, or save to let the store use its default banner.</p>}
+    <div className="acts"><button className="bt g" onClick={() => upd(a => [...a, { chip: '', lines: '', emoji: '✨', image: '', on: true }])}>Add slide</button><button className="bt g" onClick={() => { if (window.confirm('Reset to the default slides? Nothing is saved until you press Save hero.')) upd(() => DEF) }}>Reset to defaults</button><button className="bt" disabled={busy || !dirty} onClick={save}>{busy ? 'Saving…' : 'Save hero'}</button></div></div>
 }
