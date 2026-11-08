@@ -286,6 +286,62 @@ const LIQUID_CSS = `
 @media(max-width:340px){.auth .social{font-size:14px;gap:6px}.auth .tabs button{font-size:14px}}
 @media (prefers-reduced-motion:reduce){.fab,.add,.btn{animation:none!important}.rp{display:none}.lq-pop{animation:none!important}}
 `
+const SHOP_CSS = `
+/* ===== cart / orders / tracking / suggestions (mobile-first) ===== */
+.ptl{font-size:22px;margin:4px 2px 14px;color:var(--ink)}
+.emp{display:grid;justify-items:center;text-align:center;gap:8px;padding:48px 24px}
+.emp-i{width:96px;height:96px;border-radius:30px;background:linear-gradient(135deg,#f3e9fb,#fde7f0);display:grid;place-items:center;font-size:46px;box-shadow:var(--sh);margin-bottom:8px}
+.emp h3{font-size:19px;color:var(--ink)}.emp p{color:var(--mute);font-size:14px;margin-bottom:14px;max-width:260px}.emp .btn{width:auto;padding:0 30px}
+.frb{display:flex;gap:12px;align-items:center;padding:12px 14px;margin:2px 0 14px;border-radius:20px;background:linear-gradient(135deg,#eafaf1,#fff);border:1px solid #cdeedb;box-shadow:0 6px 18px #2a8a5214}
+.frb span{width:38px;height:38px;border-radius:12px;background:#fff;display:grid;place-items:center;font-size:20px;box-shadow:0 4px 10px #2a8a5222;flex:none}
+.frb b{display:block;font-size:13px;color:#1f7a47}.frb small{color:var(--mute);font-size:12px}
+.item.ci{align-items:flex-start;gap:14px;padding:12px;border-radius:24px}
+.item.ci .pic{width:84px;height:84px;flex:none;margin:0}
+.ci-b{flex:1;min-width:0;display:flex;flex-direction:column;align-self:stretch;gap:6px}
+.ci-t{display:flex;gap:8px;justify-content:space-between;align-items:flex-start}
+.ci-t b{font-size:14px;line-height:1.25;color:var(--ink)}
+.ci-x{flex:none;width:28px;height:28px;border-radius:50%;background:#f6effb;color:var(--mute);font-size:12px;display:grid;place-items:center}
+.ci-x:active{background:#fde7f0;color:#e0457b}
+.vtag{align-self:flex-start;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#f6effb;color:var(--p2)}
+.ci-f{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto}
+.ci-p b{display:block;font-size:16px;color:var(--p1);line-height:1.1}.ci-p small{font-size:11px;color:var(--mute)}
+.item .qty span{min-width:20px;text-align:center;font-weight:700;font-size:14px}
+.mini{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--edge);border-radius:18px;padding:12px 16px;margin:0 0 14px;box-shadow:0 6px 16px #4a166814;font-size:13px;color:var(--mute)}.mini b{color:var(--p1);font-size:17px}
+.rail{margin:22px -18px 6px}.rail .sec{padding:0 18px}
+.rail-s{display:flex;gap:12px;overflow-x:auto;padding:4px 18px 14px;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.rail-s::-webkit-scrollbar{display:none}
+.rail-s .card{flex:0 0 152px;width:152px;scroll-snap-align:start;content-visibility:visible}
+.rail-s .pic{height:118px}
+.oc{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--edge);border-radius:24px;padding:14px 14px 14px 18px;margin-bottom:12px;box-shadow:0 8px 22px #4a166818;cursor:pointer;position:relative;overflow:hidden;transition:transform .3s var(--spring)}
+.oc:active{transform:scale(.985)}
+.oc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--line)}
+.oc.s0::before{background:#e0457b}.oc.s1::before{background:#e69a1c}.oc.s2::before{background:#3b6fd9}.oc.s3::before{background:#3ab36b}
+.oc-h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px}
+.oc-h b{display:block;font-size:15px;color:var(--ink)}.oc-h small{color:var(--mute);font-size:12px}
+.sp{font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:99px;white-space:nowrap}
+.sp.s0{background:#fdecf2;color:#d93a75}.sp.s1{background:#fff3df;color:#b86e00}.sp.s2{background:#e6effd;color:#2757b3}.sp.s3{background:#e4f6ec;color:#1f8a54}
+.oc-m{display:flex;align-items:center;gap:12px}
+.ths{display:flex;flex:none}
+.ths .pic,.ti .pic{width:46px;height:46px;font-size:22px;border-radius:14px;margin:0;border:2px solid #fff;box-shadow:0 4px 10px #4a166822;flex:none}
+.ths>*+*{margin-left:-14px}
+.ths .more{width:46px;height:46px;border-radius:14px;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;border:2px solid #fff}
+.oc-t{flex:1;min-width:0;font-size:13px;color:var(--ink)}.oc-t span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.oc-t small{color:var(--mute);font-size:12px}
+.oc-p{font-size:16px;color:var(--p1);flex:none}
+.prg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:14px}.prg i{height:5px;border-radius:99px;background:var(--line)}.prg i.on{background:var(--grad)}
+.tkc{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px}
+.tkc>div{background:#fff;border-radius:18px;padding:12px;box-shadow:0 6px 16px #4a166814;border:1px solid var(--edge);min-width:0}
+.tkc small{display:block;color:var(--mute);font-size:11px;margin-bottom:2px}.tkc b{font-size:14px;color:var(--ink);word-break:break-word}
+.tl{background:#fff;border-radius:24px;padding:18px 18px 0;box-shadow:0 8px 22px #4a166818;margin:14px 0}
+.cd2{background:#fff;border:1px solid var(--edge);border-radius:24px;padding:16px;margin-top:14px;box-shadow:0 8px 22px #4a166818}
+.cd2 h5{font-size:12px;color:var(--mute);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.ti{display:flex;gap:12px;align-items:center;padding:10px 0}.ti+.ti{border-top:1px solid var(--line)}
+.ti>div{flex:1;min-width:0;font-size:13px}.ti b{color:var(--ink)}.ti small{display:block;color:var(--mute)}.ti>b:last-child{color:var(--p1);flex:none}
+.dl p{font-size:14px;line-height:1.55;color:var(--ink)}.dl small{color:var(--mute)}
+.scr.narrow .sum{margin-top:14px}
+@media(min-width:900px){.rail{margin-inline:-36px}.rail .sec{padding-inline:36px}.rail-s{padding-inline:36px}.rail-s .card{flex-basis:190px;width:190px}.rail-s .pic{height:150px}.oc:hover{transform:translateY(-2px)}}
+@media(max-width:360px){.item.ci .pic{width:72px;height:72px}.tkc{grid-template-columns:1fr 1fr}.tkc>div:last-child{grid-column:span 2}.rail-s .card{flex-basis:140px;width:140px}}
+@media(prefers-reduced-motion:reduce){.oc{transition:none}}
+`
 const POP = '.add,.fab,.qty button,.ib'
 
 /* Delegated listeners power the liquid feel everywhere: ripple, pointer-tracking light and squish-pop (no per-component handlers) */
@@ -293,7 +349,7 @@ function useLiquid() {
   useEffect(() => {
     let st = document.getElementById('lq-css')
     if (!st) { st = document.createElement('style'); st.id = 'lq-css'; document.head.appendChild(st) }
-    if (st.textContent !== LIQUID_CSS + LOC_CSS) st.textContent = LIQUID_CSS + LOC_CSS
+    if (st.textContent !== LIQUID_CSS + LOC_CSS + SHOP_CSS) st.textContent = LIQUID_CSS + LOC_CSS + SHOP_CSS
     if (NOMOTION) return
     const light = (el, e) => {
       const r = el.getBoundingClientRect()
@@ -537,8 +593,22 @@ function AddressScreen({ loc, back, onSave }) {
     <div className="buybar one"><button className="btn" onClick={save}>Confirm location</button></div></>
 }
 
-const CartItem = memo(({ i, qty }) => <div className="item rise"><Pic p={i} /><div><b style={{ color: '#2a1a3a' }}>{i.name}</b><br /><small style={{ color: '#8b8197' }}>{i.variant}</small><br /><b>{taka(i.price)}</b></div>
-  <div className="qty"><button aria-label="Decrease" onClick={() => qty(i.key, -1)}>−</button>{i.qty}<button aria-label="Increase" onClick={() => qty(i.key, 1)}>+</button></div></div>)
+const suggest = (prods, refs, skip, n = 8) => prods.filter(x => !skip.has(x.id) && x.is_active !== false).map(x => ({ x, v: Math.max(0, ...refs.map(r => (r.category_id === x.category_id ? 4 : 0) + (r.brand && r.brand === x.brand ? 2 : 0) + (r.tag && r.tag === x.tag ? 1 : 0))) + (x.rating || 0) / 10 + Math.min(x.reviews || 0, 2000) / 20000 })).sort((p, q) => q.v - p.v).slice(0, n).map(o => o.x)
+
+const Rail = ({ title, list, add, open, wish, like }) => list.length ? <section className="rail"><div className="sec"><span>{title}</span></div><div className="rail-s">{list.map((p, i) => <ProductCard key={p.id} {...{ p, i, add, open, like }} liked={wish.has(p.id)} />)}</div></section> : null
+
+const CartItem = memo(({ i, qty }) => <div className="item ci rise"><Pic p={i} />
+  <div className="ci-b"><div className="ci-t"><b>{i.name}</b><button className="ci-x" aria-label={'Remove ' + i.name} onClick={() => qty(i.key, -i.qty)}>✕</button></div>
+    {i.variant && i.variant !== 'Standard' && <span className="vtag">{i.variant}</span>}
+    <div className="ci-f"><span className="ci-p"><b>{taka(i.price * i.qty)}</b>{i.qty > 1 && <small>{taka(i.price)} each</small>}</span>
+      <div className="qty"><button aria-label="Decrease" onClick={() => qty(i.key, -1)}>−</button><span>{i.qty}</span><button aria-label="Increase" onClick={() => qty(i.key, 1)}>+</button></div></div></div></div>)
+
+const OrderCard = ({ o, st, open }) => { const its = o.items || [], n = its.reduce((a, i) => a + (i.qty || 1), 0), names = its.slice(0, 2).map(i => i.name).join(', ')
+  return <div className={'oc rise s' + st} role="button" tabIndex={0} onClick={() => open(o)} onKeyDown={e => e.key === 'Enter' && open(o)}>
+    <div className="oc-h"><div><b>#{o.order_no}</b><small>{new Date(o.created_at).toLocaleDateString([], { dateStyle: 'medium' })}</small></div><span className={'sp s' + st}>{STEPS[st]}</span></div>
+    <div className="oc-m"><div className="ths">{its.slice(0, 3).map((i, k) => <Pic key={k} p={i} />)}{its.length > 3 && <span className="more">+{its.length - 3}</span>}</div>
+      <div className="oc-t"><span>{names || 'Order'}{its.length > 2 ? ` +${its.length - 2} more` : ''}</span><small>{n} item{n === 1 ? '' : 's'}</small></div><b className="oc-p">{taka(o.total)}</b></div>
+    <div className="prg" aria-hidden="true">{STEPS.map((_, k) => <i key={k} className={k <= st ? 'on' : ''} />)}</div></div> }
 
 const Profile = memo(({ user, admin, count, wishCount, place, hasAddr, tab, go, say, onLogout }) => {
   const cols = useMemo(() => [
@@ -560,6 +630,7 @@ const Profile = memo(({ user, admin, count, wishCount, place, hasAddr, tab, go, 
 })
 
 export default function App() {
+  const [oflt, setOflt] = useState('all')
   useLiquid()
   const [stack, setStack] = useState([{ s: 'splash' }])
   const [user, setUser] = useState(() => { try { return api.getUser() } catch { return null } })
@@ -700,6 +771,8 @@ export default function App() {
   }, [say])
   const gp = { add: addToCart, open, wish: wishSet, like }
   const qty = useCallback((key, d) => setCart(c => c.map(i => i.key === key ? { ...i, qty: i.qty + d } : i).filter(i => i.qty > 0)), [])
+  const reorder = o => { setCart(c => { const m = [...c]; (o.items || []).forEach(i => { const key = i.key || i.id + (i.variant || ''), k = m.findIndex(x => x.key === key); if (k >= 0) m[k] = { ...m[k], qty: m[k].qty + i.qty }; else m.push({ ...i, key }) }); return m }); say('Items added to your cart'); tab('cart') }
+  const cartSugg = useMemo(() => s === 'cart' && cart.length ? suggest(prods, prods.filter(p => cart.some(i => i.id === p.id)), new Set(cart.map(i => i.id)), 8) : [], [s, cart, prods])
 
   const login = async e => {
     e?.preventDefault?.()
@@ -771,21 +844,23 @@ export default function App() {
     <div className="tools"><div className="search">🔍<input placeholder={`Search ${cur.c.name}...`} value={q} onChange={e => setQ(e.target.value)} /></div><select className="inp sort" aria-label="Sort" value={sort} onChange={e => setSort(e.target.value)}>{Object.entries(SORTS).map(([k, v]) => <option key={k} value={k}>{v[0]}</option>)}</select></div>
     <div className="chips">{tags.map(t => <button key={t} className={chip === t ? 'on' : ''} onClick={() => setChip(t)}>{t}</button>)}</div><Grid list={shown} loading={loading} {...gp} /></div></>
 
-  if (s === 'product') body = <ProductScreen key={cur.p.id} {...{ p: cur.p, back, addToCart, count, go, like }} liked={wishSet.has(cur.p.id)} />
+  if (s === 'product') body = <ProductScreen key={cur.p.id} {...{ p: cur.p, back, addToCart, count, go, like, open }} prods={prods} wish={wishSet} liked={wishSet.has(cur.p.id)} />
 
   if (s === 'cart') body = <><Hdr title={`My Cart (${count})`} back={back} right={cart.length > 0 && <button className="ib" aria-label="Clear cart" onClick={() => { setCart([]); setPromoOn(false) }}>🗑️</button>} /><div className="scr narrow">
-    {!cart.length ? <p className="empty" style={{ padding: 60 }}>Your cart is empty</p> : <><Steps n={0} />
+    {!cart.length ? <div className="emp"><div className="emp-i">🛍️</div><h3>Your cart is empty</h3><p>Browse our categories and add something you like.</p><button className="btn" onClick={() => tab('categories')}>Start shopping</button></div> : <><Steps n={0} />
+      <div className="frb"><span>🚚</span><div><b>Free discreet delivery</b><small>Plain, private packaging across Chattogram</small></div></div>
       {cart.map(i => <CartItem key={i.key} i={i} qty={qty} />)}
       <div className="promo"><input placeholder="Have a promo code? (try SHIELD10)" value={promo} onChange={e => setPromo(e.target.value)} /><button onClick={applyPromo}>Apply</button></div>
-      <div className="sum"><div><span>Subtotal</span><span><Money v={subtotal} /></span></div>{disc > 0 && <div><span>Discount</span><span>−<Money v={disc} /></span></div>}<div><span>Delivery Fee</span><span style={{ color: '#e0457b' }}>৳0</span></div><div className="t"><span>Total</span><span><Money v={total} /></span></div></div>
-      <button className="btn" style={{ marginTop: 16 }} onClick={() => go('checkout')}>Proceed to Checkout</button></>}</div></>
+      <div className="sum"><div><span>Subtotal ({count} item{count === 1 ? '' : 's'})</span><span><Money v={subtotal} /></span></div>{disc > 0 && <div><span>Discount</span><span style={{ color: '#3ab36b' }}>−<Money v={disc} /></span></div>}<div><span>Delivery Fee</span><span style={{ color: '#3ab36b', fontWeight: 700 }}>Free</span></div><div className="t"><span>Total</span><span><Money v={total} /></span></div></div>
+      <Rail title="Add more to your order" list={cartSugg} {...gp} /></>}</div>
+    {cart.length > 0 && <div className="buybar"><div><small>Total · {count} item{count === 1 ? '' : 's'}</small><b><Money v={total} /></b></div><button className="btn buy" onClick={() => go('checkout')}>Checkout →</button></div>}</>
 
   if (s === 'checkout') body = <><Hdr title="Delivery Details" back={back} /><div className="scr narrow"><Steps n={1} />
     {[['name', 'Full Name', 'name'], ['phone', 'Phone Number (+8801XXXXXXXXX)', 'tel'], ['address', 'House, Road, Area, Chattogram', 'street-address'], ['note', 'Delivery Instructions (Optional)', 'off']].map(([k, l, ac]) => <input key={k} className="inp" placeholder={l} autoComplete={ac} inputMode={k === 'phone' ? 'tel' : undefined} value={addr[k]} onChange={e => setAddr(a => ({ ...a, [k]: e.target.value }))} />)}
     <div className="note">🔒 Your order will be delivered in discreet packaging.</div>
     <button className="btn" onClick={() => !addr.name.trim() ? say('Enter your full name') : addr.phone.replace(/\D/g, '').length < 10 ? say('Enter a valid phone number (at least 10 digits)') : !addr.address.trim() ? say('Enter your delivery address') : go('payment')}>Continue to Payment</button></div></>
 
-  if (s === 'payment') body = <><Hdr title="Payment Method" back={back} /><div className="scr narrow"><Steps n={2} />
+  if (s === 'payment') body = <><Hdr title="Payment Method" back={back} /><div className="scr narrow"><Steps n={2} /><div className="mini"><span>{count} item{count === 1 ? '' : 's'} · Free delivery</span><b><Money v={total} /></b></div>
     {PAYS.map(([n, d], k) => <button key={n} className={'pay' + (pay === k ? ' on' : '')} onClick={() => setPay(k)}><PayLogo k={k} /><div><b>{n}</b><small>{d}</small></div><i /></button>)}
     <div className="note" style={{ background: '#eaf8efcc', color: '#2a8a52' }}>🛡️ SSL Secured Payment — your information is always protected.</div>
     <button className="btn" disabled={busy} onClick={place}>{busy ? <i className="spin" /> : <>Place Order · <Money v={total} /></>}</button></div></>
@@ -794,13 +869,21 @@ export default function App() {
     <p style={{ color: '#8b8197', marginBottom: 30 }}>Thank you for choosing MyShield.<br />Your order will be delivered soon.</p>
     <button className="btn" onClick={() => go('tracking', { order: cur.order })}>Track Order</button><button className="btn o" style={{ marginTop: 12 }} onClick={() => tab('home')}>Continue Shopping</button></div>
 
-  if (s === 'orders') body = <div className="scr narrow"><h2 style={{ marginBottom: 14 }}>My Orders</h2>
-    {!orders.length ? <p className="empty" style={{ padding: 60 }}>No orders yet</p> : orders.map(o => <div key={o.id} className="item rise" style={{ cursor: 'pointer' }} onClick={() => go('tracking', { order: o })}><div style={{ fontSize: 28 }}>📦</div><div><b style={{ color: '#2a1a3a' }}>#{o.order_no}</b><br /><small style={{ color: '#8b8197' }}>{STEPS[o.status || 0]} · {new Date(o.created_at).toLocaleDateString()}</small></div><b>{taka(o.total)}</b></div>)}</div>
+  if (s === 'orders') { const stOf = o => liveSt[o.order_no] ?? (o.status || 0), list = orders.filter(o => oflt === 'all' || (oflt === 'active') === (stOf(o) < 3))
+    body = <div className="scr narrow"><h2 className="ptl">My Orders</h2>
+      {orders.length > 0 && <div className="chips">{[['all', 'All'], ['active', 'Active'], ['done', 'Delivered']].map(([k, l]) => <button key={k} className={oflt === k ? 'on' : ''} onClick={() => setOflt(k)}>{l}</button>)}</div>}
+      {!orders.length ? <div className="emp"><div className="emp-i">📦</div><h3>No orders yet</h3><p>Your orders and their live status will show up here.</p><button className="btn" onClick={() => tab('home')}>Start shopping</button></div>
+        : !list.length ? <p className="empty">No {oflt === 'active' ? 'active' : 'delivered'} orders.</p> : list.map(o => <OrderCard key={o.id} o={o} st={stOf(o)} open={x => go('tracking', { order: x })} />)}</div> }
 
-  if (s === 'tracking') { const o = orders.find(x => x.id === cur.order.id) || cur.order, st = liveSt[o.order_no] ?? (o.status || 0), t = new Date(o.created_at)
-    body = <><Hdr title="Order Tracking" back={back} /><div className="scr narrow"><small style={{ color: '#8b8197' }}>Order #{o.order_no}</small>
+  if (s === 'tracking') { const o = orders.find(x => x.id === cur.order.id) || cur.order, st = liveSt[o.order_no] ?? (o.status || 0), t = new Date(o.created_at), its = o.items || [], ad = o.address || {}, sub = its.reduce((x, i) => x + i.price * i.qty, 0), dc = Math.max(0, sub - o.total)
+    body = <><Hdr title="Order Tracking" back={back} /><div className="scr narrow">
+      <div className="tkc"><div><small>Order</small><b>#{o.order_no}</b></div><div><small>Placed</small><b>{t.toLocaleDateString([], { dateStyle: 'medium' })}</b></div><div><small>Total</small><b>{taka(o.total)}</b></div></div>
       <div className="tl">{STEPS.map((l, i) => <div key={l} className={'st' + (i <= st ? ' d' : '') + (i === st && st < 3 ? ' cur' : '')}><i>{i <= st && '✓'}</i><div><b>{l}</b><small>{i <= st ? t.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Expected soon'}</small></div></div>)}</div>
-      <div className="way"><span>{['📝', '📦', '🚚', '✅'][st]}</span><div><b>{['Order received!', 'We are preparing your order', 'Your order is on the way!', 'Delivered. Thank you!'][st]}</b><br />{['We will confirm it shortly.', 'It will be handed to our delivery partner soon.', 'Our delivery partner will reach you soon.', 'Hope you love it.'][st]}</div></div></div></> }
+      <div className="way"><span>{['📝', '📦', '🚚', '✅'][st]}</span><div><b>{['Order received!', 'We are preparing your order', 'Your order is on the way!', 'Delivered. Thank you!'][st]}</b><br />{['We will confirm it shortly.', 'It will be handed to our delivery partner soon.', 'Our delivery partner will reach you soon.', 'Hope you love it.'][st]}</div></div>
+      {its.length > 0 && <div className="cd2"><h5>Items</h5>{its.map((i, k) => <div className="ti" key={i.key || k}><Pic p={i} /><div><b>{i.name}</b><small>{i.variant && i.variant !== 'Standard' ? i.variant + ' · ' : ''}{taka(i.price)} × {i.qty}</small></div><b>{taka(i.price * i.qty)}</b></div>)}</div>}
+      {(ad.address || ad.name) && <div className="cd2 dl"><h5>Delivery to</h5><p><b>{ad.name}</b>{ad.phone && ' · ' + ad.phone}</p><p>{ad.address}</p>{ad.note && <small>Note: {ad.note}</small>}</div>}
+      <div className="sum"><div><span>Subtotal</span><span>{taka(sub)}</span></div>{dc > 0.5 && <div><span>Discount</span><span style={{ color: '#3ab36b' }}>−{taka(dc)}</span></div>}<div><span>Delivery</span><span style={{ color: '#3ab36b', fontWeight: 700 }}>Free</span></div>{o.payment && <div><span>Payment</span><span>{o.payment}</span></div>}<div className="t"><span>Total</span><span>{taka(o.total)}</span></div></div>
+      {its.length > 0 && <button className="btn o" style={{ marginTop: 14 }} onClick={() => reorder(o)}>Order again</button>}</div></> }
 
   if (s === 'profile') body = <Profile {...{ user, admin, count, tab, go, say }} wishCount={wish.length} place={loc.area || loc.city} hasAddr={!!(loc.area || loc.line)} onLogout={logout} />
 
@@ -825,13 +908,14 @@ export default function App() {
 
 function safeAdmin(u) { try { return api.isAdmin(u) } catch { return false } }
 
-function ProductScreen({ p, back, addToCart, count, go, liked, like }) {
+function ProductScreen({ p, back, addToCart, count, go, liked, like, prods = [], open, wish }) {
   const [v, setV] = useState(p.variants?.[0]), [added, setAdded] = useState(false), [n, setN] = useState(1)
   const t = useRef(0)
   useEffect(() => () => clearTimeout(t.current), [])
   const price = p.price * (v?.mult || 1)
   const add = () => { addToCart(p, v, n); setAdded(true); clearTimeout(t.current); t.current = setTimeout(() => setAdded(false), 1200) }
   const multi = (p.variants || []).length > 1
+  const sugg = useMemo(() => suggest(prods, [p], new Set([p.id]), 8), [prods, p])
   return <><Hdr title="Details" back={back} right={<button className="ib" aria-label="Open cart" onClick={() => go('cart')}><Icon n="bag" />{count > 0 && <em className="cb" key={count}>{count}</em>}</button>} />
     <div className="scr pd"><div className="pdp"><Pic p={p} big /><div className="fadeUp pdp-info">
       <small className="pk">{[p.brand, p.tag].filter(Boolean).join(' · ') || 'MyShield'}</small>
@@ -840,6 +924,7 @@ function ProductScreen({ p, back, addToCart, count, go, liked, like }) {
       <div className="store"><span className="sl"><Glyph v="🛡️" /></span><div><b>MyShield Store<i className="vf">✓</i></b><small>Official store</small></div><span className="fl">Verified</span></div>
       <div className="opt"><div className="opt-l">{multi && <><span>Select option</span><div className="var">{p.variants.map(x => <button key={x.label} className={v?.label === x.label ? 'on' : ''} onClick={() => setV(x)}>{x.label}</button>)}</div></>}</div>
         <div className="opt-r"><span>QTY</span><div className="qty"><button aria-label="Decrease" onClick={() => setN(x => Math.max(1, x - 1))}>−</button><span className="qn">{n}</span><button aria-label="Increase" onClick={() => setN(x => Math.min(20, x + 1))}>+</button></div></div></div>
-      <div className="dsc"><h5>Description</h5><ul className="ck">{(p.features || []).map(f => <li key={f}>{f}</li>)}</ul></div></div></div></div>
+      <div className="dsc"><h5>Description</h5><ul className="ck">{(p.features || []).map(f => <li key={f}>{f}</li>)}</ul></div></div></div>
+      {sugg.length > 0 && <Rail title="You may also like" list={sugg} add={addToCart} open={open} wish={wish} like={like} />}</div>
     <div className="buybar"><div><small>Total price</small><b><Money v={price * n} /></b></div><button className={'btn buy' + (added ? ' done' : '')} onClick={add}><Icon n="bag" />{added ? 'Added ✓' : 'Add to Cart'}</button></div></>
 }
