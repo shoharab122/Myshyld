@@ -2,6 +2,26 @@ import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useSta
 import * as api from './api'
 
 const taka = n => '৳' + Math.round(n).toLocaleString()
+
+// ===== Delivery zone (Bahaddarhat hub, Chattogram) =====
+// Keep these numbers identical to delivery_fee_for() in delivery-charge.sql
+const HUB = { lat: 22.3411, lng: 91.8428 }
+const IN_RANGE_KM = 4, MAX_KM = 30, FEE_IN = 40, FEE_OUT = 60
+const OUT_MSG = `Sorry, we only deliver inside Chattogram (within ${MAX_KM} km of Bahaddarhat).`
+const havKm = (a, b, c, d) => {
+  const R = 6371, rad = Math.PI / 180, dx = (c - a) * rad, dy = (d - b) * rad
+  const h = Math.sin(dx / 2) ** 2 + Math.cos(a * rad) * Math.cos(c * rad) * Math.sin(dy / 2) ** 2
+  return R * 2 * Math.asin(Math.sqrt(h))
+}
+const hasNum = v => v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))
+const deliveryFor = loc => {
+  if (!hasNum(loc?.lat) || !hasNum(loc?.lng)) return { fee: FEE_IN, km: null, zone: 'inner', label: `৳${FEE_IN} · pin your location for exact pricing` }
+  const km = havKm(HUB.lat, HUB.lng, Number(loc.lat), Number(loc.lng))
+  if (km > MAX_KM) return { fee: null, km, zone: 'outside', label: 'Outside our delivery area' }
+  const fee = km <= IN_RANGE_KM ? FEE_IN : FEE_OUT
+  return { fee, km, zone: fee === FEE_IN ? 'inner' : 'outer', label: `৳${fee} · ${km.toFixed(1)} km from Bahaddarhat` }
+}
+const feeTxt = d => d.fee == null ? 'Outside area' : '৳' + d.fee
 const NAV = [['home', 'home', 'Home'], ['categories', 'grid', 'Categories'], ['cart', 'bag', 'Cart'], ['orders', 'receipt', 'Orders'], ['profile', 'user', 'Profile']]
 const TABS = NAV.map(n => n[0])
 const OB = [
@@ -11,7 +31,7 @@ const OB = [
 ]
 const STEPS = ['Order Placed', 'Processing', 'Out for Delivery', 'Delivered']
 const PAYS = [['Cash on Delivery', 'Pay when you receive', '💵'], ['bKash', 'Send money, then enter your TrxID', '🌸'], ['Nagad', 'Pay with Nagad', '🟠'], ['Debit/Credit Card', 'Visa, Mastercard', '💳']]
-const OFFERS = [['Limited Offer', 'Privacy. Confidence.|Comfort. Wellness.', '🛡️'], ['Free Delivery', 'Discreet delivery|across Chattogram', '🚚'], ['Use code SHIELD10', 'Get 10% off|your first order', '🎁']]
+const OFFERS = [['Limited Offer', 'Privacy. Confidence.|Comfort. Wellness.', '🛡️'], ['Delivery from ৳40', 'Discreet delivery|across Chattogram', '🚚'], ['Use code SHIELD10', 'Get 10% off|your first order', '🎁']]
 const SORTS = { pop: ['Popular', (a, b) => b.reviews - a.reviews], lo: ['Price: Low → High', (a, b) => a.price - b.price], hi: ['Price: High → Low', (a, b) => b.price - a.price], rate: ['Top rated', (a, b) => b.rating - a.rating] }
 const RIPPLE = '.bshop,.cc,.btn,.fab,.add,.cat,.card,.pay,.menu,.ib,.tabs button,.chips button,.var button,.heart,.qty button,.promo button,.social'
 const NOMOTION = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -796,6 +816,7 @@ function AddressScreen({ loc, back, onSave }) {
       </div>
       {err && <p className="mp-err" role="alert">{err}</p>}
       <div className="mp-card"><span><Icon n="pin" /></span><div><small>Delivering to</small><b>{fullAddr(clean) || 'Move the pin or search to set location'}</b></div></div>
+      {(() => { const d = deliveryFor(clean); return <div className={'dl-card' + (d.fee == null ? ' bad' : '')}><span className="dl-ic">🛵</span><div><small>Delivery charge{d.km != null ? ` · ${d.km.toFixed(1)} km from Bahaddarhat` : ''}</small><b>{d.fee == null ? 'Outside Chattogram — we cannot deliver here' : d.km == null ? 'Pin your location for the exact charge' : 'Inside our delivery area'}</b></div><em>{feeTxt(d)}</em></div> })()}
       <div className="mp-man">
         <h5>✏️ Adjust manually</h5>
         <label className="lbl">City<input className="inp" value={f.city} onChange={set('city')} autoComplete="address-level2" /></label>
@@ -856,7 +877,10 @@ export default function App() {
   const [ob, setOb] = useState(0), [mode, setMode] = useState(() => api.RECOVERY_LINK ? 'reset' : api.LINK_EXPIRED ? 'forgot' : 'login')
   const [form, setForm] = useState({ name: '', phone: '', id: '', pw: '', pw2: '' }), [showPw, setShowPw] = useState(false), [shake, setShake] = useState(false), [busy, setBusy] = useState(false)
   const [loc, setLoc] = useState(() => ({ city: 'Chattogram', area: '', line: '', ...readLS('ms_loc', {}) }))
-  const [addr, setAddr] = useState(() => ({ name: '', phone: '', address: fullAddr(readLS('ms_loc', null)), note: '' }))
+  const [addr, setAddr] = useState(() => {
+    const l = readLS('ms_loc', null)
+    return { name: '', phone: '', address: fullAddr(l), note: '', lat: l?.lat, lng: l?.lng }
+  })
   const [pay, setPay] = useState(0), [promo, setPromo] = useState(''), [promoOn, setPromoOn] = useState(false)
   const [q, setQ] = useState(''), [nc, setNc] = useState({ name: '', icon: '🛍️' })
   const [np, setNp] = useState({ name: '', price: '', category_id: '', image_url: '' })
@@ -908,7 +932,7 @@ export default function App() {
   const logout = useCallback(async () => { await safe(() => api.signOut()); setUser(null); tab('auth') }, [tab])
   const saveLoc = useCallback(v => {
     if (!v) return say('Add your area or full address')
-    setLoc(v); writeLS('ms_loc', v); setAddr(a => ({ ...a, address: fullAddr(v) })); say('Address saved'); back()
+    setLoc(v); writeLS('ms_loc', v); setAddr(a => ({ ...a, address: fullAddr(v), lat: v.lat, lng: v.lng })); say('Address saved'); back()
   }, [say, back])
   const bad = useCallback(m => { say(m); setShake(true); setTimeout(() => setShake(false), 480) }, [say])
 
@@ -985,7 +1009,8 @@ export default function App() {
   const wishSet = useMemo(() => new Set(wish), [wish])
   const { subtotal, count } = useMemo(() => ({ subtotal: cart.reduce((a, i) => a + i.price * i.qty, 0), count: cart.reduce((a, i) => a + i.qty, 0) }), [cart])
   const disc = promoOn ? Math.round(subtotal * 0.1) : 0
-  const total = Math.max(0, subtotal - disc)
+  const delivery = useMemo(() => deliveryFor(loc), [loc])
+  const total = Math.max(0, subtotal - disc + (delivery.fee || 0))
   const catCount = useMemo(() => { const m = new Map(); for (const p of prods) m.set(p.category_id, (m.get(p.category_id) || 0) + 1); return m }, [prods])
   const hits = useMemo(() => { if (!dq) return prods; const k = dq.toLowerCase(); return prods.filter(p => (p.name + ' ' + (p.brand || '')).toLowerCase().includes(k)) }, [prods, dq])
   const pop = useMemo(() => dq ? hits : hits.slice(0, 6), [dq, hits])
@@ -1037,6 +1062,7 @@ export default function App() {
   const applyPromo = () => promo.trim().toUpperCase() === 'SHIELD10' ? (setPromoOn(true), say('10% off applied')) : say('Invalid promo code')
   const place = async () => {
     if (busy) return
+    if (delivery.fee == null) return say(OUT_MSG, 3500)
     if (pay === 1) { // manual bKash: no order yet. It is created only when the customer submits the TrxID, so leaving keeps the cart
       if (!realUid(user) || !api.supabase) return say('Please sign in with your email to pay with bKash')
       return go('bkash')
@@ -1050,14 +1076,14 @@ export default function App() {
     }
     setBusy(true)
     try {
-      const o = await api.placeOrder({ user_id: user?.id, items: cart, total, address: addr, payment: PAYS[pay][0] })
+      const o = await api.placeOrder({ user_id: user?.id, items: cart, total, delivery_fee: delivery.fee, address: addr, payment: PAYS[pay][0] })
       // placeOrder falls back to this device only (guests / signed-out). Also send it to the store so the admin sees every order.
       if (api.supabase && typeof o.id === 'string' && /^o\d{6,}$/.test(o.id)) {
         try { const { id: _local, ...row } = o; await api.supabase.from('orders').insert({ ...row, user_id: realUid(user) }) } catch { /* kept locally */ }
       }
       setCart([]); setPromoOn(false)
       collapse(() => { depth.current = 1; try { history.pushState({ ms: 1 }, '') } catch { /* history blocked */ } setDir('fwd'); setStack([{ s: 'home' }, { s: 'done', order: o }]) })
-    } catch { say('Could not place order. Please try again.') }
+    } catch (e) { say(e?.message || 'Could not place order. Please try again.', 3500) }
     finally { setBusy(false) }
   }
   // Coming back from bKash / Nagad: trust only the database (the order must really be marked paid by the server)
@@ -1138,22 +1164,26 @@ export default function App() {
 
   if (s === 'cart') body = <><Hdr title={`My Cart (${count})`} back={back} right={cart.length > 0 && <button className="ib" aria-label="Clear cart" onClick={() => { setCart([]); setPromoOn(false) }}>🗑️</button>} /><div className="scr narrow">
     {!cart.length ? <div className="emp"><div className="emp-i"><CartArt /></div><h3>Your cart is empty</h3><p>Browse our categories and add something you like.</p><button className="btn" onClick={() => tab('categories')}>Start shopping</button></div> : <><Steps n={0} />
-      <div className="frb"><span>🚚</span><div><b>Free discreet delivery</b><small>Plain, private packaging across Chattogram</small></div></div>
+      <div className="frb"><span>🚚</span><div><b>Discreet delivery across Chattogram</b><small>৳40 within 4 km · ৳60 up to 30 km of Bahaddarhat</small></div></div>
       {cart.map(i => <CartItem key={i.key} i={i} qty={qty} />)}
       <div className="promo"><input placeholder="Have a promo code? (try SHIELD10)" value={promo} onChange={e => setPromo(e.target.value)} /><button onClick={applyPromo}>Apply</button></div>
-      <div className="sum"><div><span>Subtotal ({count} item{count === 1 ? '' : 's'})</span><span><Money v={subtotal} /></span></div>{disc > 0 && <div><span>Discount</span><span style={{ color: '#3ab36b' }}>−<Money v={disc} /></span></div>}<div><span>Delivery Fee</span><span style={{ color: '#3ab36b', fontWeight: 700 }}>Free</span></div><div className="t"><span>Total</span><span><Money v={total} /></span></div></div>
+      <div className="sum"><div><span>Subtotal ({count} item{count === 1 ? '' : 's'})</span><span><Money v={subtotal} /></span></div>{disc > 0 && <div><span>Discount</span><span style={{ color: '#3ab36b' }}>−<Money v={disc} /></span></div>}<div><span>Delivery{delivery.km != null && <small className="dl-km"> · {delivery.km.toFixed(1)} km</small>}</span><span className={delivery.fee == null ? 'dl-bad' : 'dl-ok'}>{feeTxt(delivery)}</span></div><div className="t"><span>Total</span><span><Money v={total} /></span></div></div>
       <Rail title="Add more to your order" list={cartSugg} {...gp} /></>}</div>
-    {cart.length > 0 && <div className="buybar"><div><small>Total · {count} item{count === 1 ? '' : 's'}</small><b><Money v={total} /></b></div><button className="btn buy" onClick={() => go('checkout')}>Checkout →</button></div>}</>
+    {cart.length > 0 && <div className="buybar"><div><small>Total · {count} item{count === 1 ? '' : 's'}</small><b><Money v={total} /></b></div><button className="btn buy" onClick={() => delivery.fee == null ? say(OUT_MSG, 3500) : go('checkout')}>Checkout →</button></div>}</>
 
   if (s === 'checkout') body = <><Hdr title="Delivery Details" back={back} /><div className="scr narrow"><Steps n={1} />
     {[['name', 'Full Name', 'name'], ['phone', 'Phone Number (+8801XXXXXXXXX)', 'tel'], ['address', 'House, Road, Area, Chattogram', 'street-address'], ['note', 'Delivery Instructions (Optional)', 'off']].map(([k, l, ac]) => <input key={k} className="inp" placeholder={l} autoComplete={ac} inputMode={k === 'phone' ? 'tel' : undefined} value={addr[k]} onChange={e => setAddr(a => ({ ...a, [k]: e.target.value }))} />)}
+    <div className={'dl-card' + (delivery.fee == null ? ' bad' : '')}><span className="dl-ic">🛵</span><div><small>Delivery charge{delivery.km != null ? ` · ${delivery.km.toFixed(1)} km` : ''}</small><b>{delivery.fee == null ? 'Outside our delivery area' : delivery.label}</b></div><em>{feeTxt(delivery)}</em></div>
     <div className="note">🔒 Your order will be delivered in discreet packaging.</div>
-    <button className="btn" onClick={() => !addr.name.trim() ? say('Enter your full name') : addr.phone.replace(/\D/g, '').length < 10 ? say('Enter a valid phone number (at least 10 digits)') : !addr.address.trim() ? say('Enter your delivery address') : go('payment')}>Continue to Payment</button></div></>
+    <button className="btn" onClick={() => delivery.fee == null ? say(OUT_MSG, 3500) : !addr.name.trim() ? say('Enter your full name') : addr.phone.replace(/\D/g, '').length < 10 ? say('Enter a valid phone number (at least 10 digits)') : !addr.address.trim() ? say('Enter your delivery address') : go('payment')}>Continue to Payment</button></div></>
 
-  if (s === 'payment') body = <><Hdr title="Payment Method" back={back} /><div className="scr narrow"><Steps n={2} /><div className="mini"><span>{count} item{count === 1 ? '' : 's'} · Free delivery</span><b><Money v={total} /></b></div>
+  if (s === 'payment') body = <><Hdr title="Payment Method" back={back} /><div className="scr narrow"><Steps n={2} /><div className="mini"><span>{count} item{count === 1 ? '' : 's'} · {delivery.fee != null ? `Delivery ৳${delivery.fee}${delivery.km != null ? ` (${delivery.km.toFixed(1)} km)` : ''}` : 'Outside delivery area'}</span><b><Money v={total} /></b></div>
     {PAYS.map(([n, d], k) => <button key={n} className={'pay' + (pay === k ? ' on' : '')} onClick={() => setPay(k)}><PayLogo k={k} /><div><b>{n}</b><small>{d}</small></div><i /></button>)}
+    {delivery.fee == null
+      ? <div className="note" style={{ background: '#fff0f3cc', color: '#c62d4a' }}>⚠️ {OUT_MSG} Please choose a closer address.</div>
+      : <div className="note" style={{ background: '#eaf8efcc', color: '#2a8a52' }}>🛵 {delivery.label}</div>}
     <div className="note" style={{ background: '#eaf8efcc', color: '#2a8a52' }}>🛡️ SSL Secured Payment — your information is always protected.</div>
-    <button className="btn" disabled={busy} onClick={place}>{busy ? <i className="spin" /> : <>{pay === 1 ? 'Continue to bKash' : pay === 2 ? 'Pay Now' : 'Place Order'} · <Money v={total} /></>}</button></div></>
+    <button className="btn" disabled={busy || delivery.fee == null} onClick={place}>{delivery.fee == null ? '📦 Outside delivery area' : busy ? <i className="spin" /> : <>{pay === 1 ? 'Continue to bKash' : pay === 2 ? 'Pay Now' : 'Place Order'} · <Money v={total} /></>}</button></div></>
 
   if (s === 'bkash') body = <BkashPay total={total} cart={cart} promo={promoOn ? 'SHIELD10' : ''} addr={addr} back={back} say={say} onDone={o => {
     setCart([]); setPromoOn(false); say('Payment submitted. We are verifying it.', 3000)
@@ -1170,7 +1200,7 @@ export default function App() {
       {!orders.length ? <div className="emp"><div className="emp-i"><OrdersArt /></div><h3>No orders yet</h3><p>Your orders and their live status will show up here.</p><button className="btn" onClick={() => tab('home')}>Start shopping</button></div>
         : !list.length ? <p className="empty">No {oflt === 'active' ? 'active' : 'delivered'} orders.</p> : list.map(o => <OrderCard key={o.id} o={o} st={stOf(o)} open={x => go('tracking', { order: x })} />)}</div> }
 
-  if (s === 'tracking') { const o = orders.find(x => x.id === cur.order.id) || cur.order, st = liveSt[o.order_no] ?? (o.status || 0), t = new Date(o.created_at), its = o.items || [], ad = o.address || {}, sub = its.reduce((x, i) => x + i.price * i.qty, 0), dc = Math.max(0, sub - o.total), qn = its.reduce((x, i) => x + (i.qty || 1), 0)
+  if (s === 'tracking') { const o = orders.find(x => x.id === cur.order.id) || cur.order, st = liveSt[o.order_no] ?? (o.status || 0), t = new Date(o.created_at), its = o.items || [], ad = o.address || {}, sub = its.reduce((x, i) => x + i.price * i.qty, 0), df = o.delivery_fee == null ? null : +o.delivery_fee, dc = Math.max(0, sub + (df || 0) - o.total), qn = its.reduce((x, i) => x + (i.qty || 1), 0)
     const pst = o.payment === 'bKash' ? (o.payment_status === 'paid' ? ['Paid ✓', 'ok'] : o.payment_status === 'verifying' ? ['Verifying…', 'wait'] : ['Not paid yet', 'no']) : null
     body = <><Hdr title="Order Tracking" back={back} /><div className="scr narrow trkscr">
       <div className="tk-meta"><div><small>Order</small><b>#{o.order_no}</b></div><div><small>Placed</small><b>{t.toLocaleDateString([], { dateStyle: 'medium' })}</b><em>{t.toLocaleTimeString([], { timeStyle: 'short' })}</em></div><div><small>Total</small><b className="g">{taka(o.total)}</b></div></div>
@@ -1180,7 +1210,7 @@ export default function App() {
         {(ad.address || ad.name) && <div className="tk-row"><span className="tk-ic"><Icon n="pin" /></span><div><small>Delivering to</small><b>{ad.name}{ad.phone && ' · ' + ad.phone}</b>{ad.address && <p>{ad.address}</p>}{ad.note && <em>Note: {ad.note}</em>}</div></div>}
         {o.payment && <div className="tk-row"><span className="tk-ic"><Icon n="card" /></span><div><small>Payment method</small><b>{o.payment}</b></div>{pst && <span className={'tk-chip ' + pst[1]}>{pst[0]}</span>}</div>}</section>}
       <section className="tk-card tk-bill"><header><h5>Bill summary</h5></header>
-        <div className="r"><span>Subtotal</span><span>{taka(sub)}</span></div>{dc > 0.5 && <div className="r g"><span>Discount</span><span>−{taka(dc)}</span></div>}<div className="r g"><span>Delivery</span><span>Free</span></div>
+        <div className="r"><span>Subtotal</span><span>{taka(sub)}</span></div>{dc > 0.5 && <div className="r g"><span>Discount</span><span>−{taka(dc)}</span></div>}{df == null ? <div className="r g"><span>Delivery</span><span>Free</span></div> : <div className="r"><span>Delivery{o.delivery_km != null && ` · ${(+o.delivery_km).toFixed(1)} km`}</span><span>{taka(df)}</span></div>}
         <div className="tot"><span>Total</span><span>{taka(o.total)}</span></div></section>
       {its.length > 0 && <button className="btn o" style={{ marginTop: 14 }} onClick={() => reorder(o)}>Order again</button>}</div></> }
 
