@@ -375,3 +375,43 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   box-shadow:inset 0 2px 8px #fff,0 18px 40px #1a063a55,0 0 0 8px #ffffff1a}
 .lgcard img{width:100%;height:auto;display:block;animation:flt 3.2s ease-in-out infinite;filter:drop-shadow(0 6px 10px #4a166822)}
 @media(prefers-reduced-motion:reduce){.lgcard img{animation:none}}
+/* manual bKash payment */
+.bk{display:grid;gap:14px;align-content:start}
+.bk-hero{position:relative;background:linear-gradient(135deg,#e2136e,#a30e59);color:#fff;border-radius:22px;padding:20px 18px;display:grid;gap:2px;box-shadow:0 14px 30px #e2136e55,inset 0 1.5px 0 #ffffff55}
+.bk-hero small{opacity:.85;font-size:13px}.bk-hero b{font-size:38px;line-height:1.1;letter-spacing:-.5px}.bk-hero span{opacity:.9;font-size:13px}
+.bk-mini{all:unset;cursor:pointer;position:absolute;top:16px;right:16px;font-size:12px;font-weight:700;background:#ffffff2b;padding:6px 12px;border-radius:99px}
+.bk-card{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--edge);border-radius:18px;padding:12px 14px;box-shadow:0 6px 18px #4a16680f}
+.bk-num{flex:1;min-width:0;display:grid}.bk-num small{color:#8b8197;font-size:12px}.bk-num b{font-size:22px;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+.bk-copy{all:unset;cursor:pointer;background:#e2136e;color:#fff;font-weight:700;font-size:14px;padding:10px 18px;border-radius:12px}
+.bk-app{display:block;text-align:center;text-decoration:none;font-weight:700;color:#e2136e;border:1.5px solid #e2136e;border-radius:14px;padding:13px;background:#fff0f7}
+.bk-steps{margin:0;padding:0 0 0 20px;display:grid;gap:8px;font-size:14px;color:#5b5068}.bk-steps b{color:#24122f}
+.bk-trx{font-size:18px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bk-copy:focus-visible,.bk-mini:focus-visible,.bk-app:focus-visible{outline:3px solid #8a4bd8;outline-offset:2px}
+/* ---------- sticky home header (location + cart + search) ---------- */
+.scr.hm{--hp-p:16px;--hp-t:16px;--hp-l:18px;--hp-r:18px}
+@media(max-width:899px){.scr.hm{--hp-t:calc(16px + env(safe-area-inset-top));--hp-l:max(18px,env(safe-area-inset-left));--hp-r:max(18px,env(safe-area-inset-right))}}
+@media(min-width:900px){.scr.hm{--hp-p:24px;--hp-t:24px;--hp-l:36px;--hp-r:36px}}
+/* full-bleed row that stays pinned; layout at rest is identical to before (10px padding + 4px margin = old 14px gap) */
+.hstick{position:sticky;top:calc(10px - var(--hp-p));z-index:12;isolation:isolate;
+  margin:calc(-1*var(--hp-t)) calc(-1*var(--hp-r)) 4px calc(-1*var(--hp-l));
+  padding:var(--hp-t) var(--hp-r) 10px var(--hp-l)}
+.hstick .search{margin:14px 0 0}
+/* solid frosted panel: fades in while scrolling, so the page looks unchanged at the top and nothing shows through when pinned */
+.hstick::before{content:'';position:absolute;inset:0 0 -6px;z-index:-1;pointer-events:none;
+  background:#f7effbf2;border-bottom:1px solid #ffffffb3;border-radius:0 0 22px 22px;
+  -webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);
+  box-shadow:0 12px 22px -14px #4a166840}
+@supports (animation-timeline:scroll()){
+  .hstick::before{opacity:0;animation:hstickIn linear both;animation-timeline:scroll(nearest block);animation-range:0 40px}
+  @keyframes hstickIn{to{opacity:1}}
+}
+/* phones: tighter, no overlap, chip + cart + search always fit on one clean column */
+@media(max-width:480px){
+  .hstick .topbar{gap:10px}
+  .hstick .topbar .loc{max-width:calc(100% - 56px)}
+  .hstick .topbar .loc .lt{min-width:0;overflow:hidden}
+  .hstick .topbar .loc b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hstick .topbar .ib{width:42px;height:42px;flex:none}
+  .hstick .search{min-height:50px;margin-top:10px}
+  .hstick .search input{padding:13px 4px}
+}
