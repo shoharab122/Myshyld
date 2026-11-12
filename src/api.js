@@ -218,3 +218,25 @@ export async function getOrderByNo(no) {
     return data || null
   } catch { return null }
 }
+// ---------------- Manual bKash payment ----------------
+// Customer sends money to this number in the bKash app, then submits the Transaction ID. An admin verifies it.
+export const BKASH = {
+  number: '01805723581',
+  mode: 'Send Money', // change to 'Payment' if this is a bKash Merchant number
+  play: 'https://play.google.com/store/apps/details?id=com.bKash.customerapp',
+}
+// Android only: opens the bKash app, or its Play Store page if it is not installed.
+export const bkashAppLink = () => typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent)
+  ? 'intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.bKash.customerapp;S.browser_fallback_url=' + encodeURIComponent(BKASH.play) + ';end'
+  : null
+// Creates the order AND records the TrxID in one database transaction (place_bkash_order), so nothing is saved unless it all succeeds.
+// The server prices the cart; "amount" is only what the customer was shown, and is rejected if it differs.
+export async function placeBkashOrder(o) {
+  if (!supabase) throw new Error('Please sign in to pay with bKash.')
+  const items = (Array.isArray(o?.items) ? o.items : []).map(i => ({ id: i.id, variant: i.variant || null, qty: i.qty }))
+  if (!items.length) throw new Error('Your cart is empty.')
+  const address = { name: str(o?.address?.name, 80), phone: str(o?.address?.phone, 20), address: str(o?.address?.address, 300), note: str(o?.address?.note, 300) }
+  const { data, error } = await supabase.rpc('place_bkash_order', { p_items: items, p_promo: str(o?.promo, 40), p_address: address, p_amount: Number(o?.amount) || 0, p_trx: str(o?.trx, 30), p_sender: str(o?.sender, 20) })
+  if (error) { const m = String(error.message || ''); throw new Error(/Transaction ID|bKash number|amount|sign in/i.test(m) ? m : friendlyOrder(error)) }
+  return data
+}
