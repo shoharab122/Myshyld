@@ -38,7 +38,7 @@ function Img({ value, onChange, folder, say }) {
 
 export default function Admin() {
   const [st, setSt] = useState('loading'), [user, setUser] = useState(null)
-  useEffect(() => { document.title = 'MyShield Admin'; const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex,nofollow'; document.head.appendChild(m); return () => m.remove() }, [])
+  useEffect(() => { document.title = 'MyShyld Admin'; const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex,nofollow'; document.head.appendChild(m); return () => m.remove() }, [])
   const check = useCallback(async s => {
     if (!s) { setUser(null); return setSt('login') }
     const { data } = await sb.from('admins').select('user_id').eq('user_id', s.user.id).maybeSingle()
@@ -66,7 +66,7 @@ function Login() {
     setBusy(false)
     if (error) { if (++fails.current >= 5) { lock.current = Date.now() + 60000; fails.current = 0 } setErr('Email or password is incorrect.') }
   }
-  return <div className="adm"><div className="ctr"><form className="lg" onSubmit={go}><div className="lgo"><img src="/logo-full.webp?v=2" width="150" height="129" alt="MyShield" decoding="async" /><small>Admin</small></div><h1>Sign in</h1>
+  return <div className="adm"><div className="ctr"><form className="lg" onSubmit={go}><div className="lgo"><img src="/logo-full.webp?v=2" width="150" height="129" alt="MyShyld" decoding="async" /><small>Admin</small></div><h1>Sign in</h1>
     <F l="Email"><input className="in" type="email" autoComplete="username" required value={f.e} onChange={e => setF({ ...f, e: e.target.value })} /></F>
     <F l="Password"><input className="in" type="password" autoComplete="current-password" required value={f.p} onChange={e => setF({ ...f, p: e.target.value })} /></F>
     {err && <p className="er" role="alert">{err}</p>}<button className="bt" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button></form></div></div>
@@ -89,7 +89,7 @@ function Shell({ user }) {
   }, [])
   const pend = d.orders.filter(o => !o.status).length, title = NAV.find(n => n[0] === tab)?.[1] || 'Overview'
   const p = { d, reload: load, say, go }
-  return <div className="adm"><nav className="sb"><div className="brand"><span className="bm"><img src="/logo-mark.webp?v=2" width="26" height="22" alt="" decoding="async" /></span>My<b>Shield</b><small>Admin</small></div>
+  return <div className="adm"><nav className="sb"><div className="brand"><span className="bm"><img src="/logo-mark.webp?v=2" width="26" height="22" alt="" decoding="async" /></span>My<b>Shyld</b><small>Admin</small></div>
     {NAV.map(([k, l, i]) => <button key={k} className={tab === k ? 'on' : ''} aria-current={tab === k ? 'page' : undefined} onClick={() => go(k)}><span aria-hidden="true">{i}</span>{l}{k === 'orders' && pend > 0 && <em>{pend}</em>}</button>)}<div className="sp" /><small className="who">{user.email}</small></nav>
     <main className="mn"><header className="top"><h1>{title}</h1><div><button className="bt g sm" onClick={load}>Refresh</button><button className="bt g sm" onClick={() => sb.auth.signOut()}>Sign out</button></div></header>
       {ld ? <div className="ctr"><i className="spin" /></div> : tab === 'dash' ? <Dash {...p} /> : tab === 'orders' ? <Orders {...p} /> : tab === 'wish' ? <Wish {...p} /> : tab === 'products' ? <Products {...p} /> : tab === 'cats' ? <Cats {...p} /> : tab === 'hero' ? <Hero say={say} /> : <Dash {...p} />}</main>
