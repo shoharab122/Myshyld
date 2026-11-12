@@ -77,11 +77,11 @@ function Shell({ user }) {
   const say = useCallback(m => { setToast(m); clearTimeout(tt.current); tt.current = setTimeout(() => setToast(''), 2400) }, [])
   const go = t => { setTab(t); history.replaceState(null, '', '#' + t); scrollTo(0, 0) }
   const load = useCallback(async () => {
-    const [o, p, c, w] = await Promise.all([sb.from('orders').select('*').in('payment_status', ['unpaid', 'paid']).order('created_at', { ascending: false }).limit(500), sb.from('products').select('*').order('created_at', { ascending: false }), sb.from('categories').select('*').order('created_at'), sb.from('wishlists').select('*').order('created_at', { ascending: false }).limit(1000)])
+    const [o, p, c, w] = await Promise.all([sb.from('orders').select('*').in('payment_status', ['unpaid', 'verifying', 'paid']).order('created_at', { ascending: false }).limit(500), sb.from('products').select('*').order('created_at', { ascending: false }), sb.from('categories').select('*').order('created_at'), sb.from('wishlists').select('*').order('created_at', { ascending: false }).limit(1000)])
     const er = o.error || p.error || c.error; if (er) say(er.message)
     setD({ orders: o.data || [], products: p.data || [], cats: c.data || [], wish: w.data || [], wishErr: !!w.error }); setLd(false)
   }, [say])
-  useEffect(() => { load(); const ch = sb.channel('adm-orders').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, () => { say('🛍️ New order received'); load() }).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'wishlists' }, () => { say('♡ Item added to a wishlist'); load() }).subscribe(); return () => { sb.removeChannel(ch) } }, [load, say])
+  useEffect(() => { load(); const ch = sb.channel('adm-orders').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, () => { say('🛍️ New order received'); load() }).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, p => { if (p.new?.payment_status === 'verifying' && p.old?.payment_status !== 'verifying') say('💗 bKash payment to verify'); load() }).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'wishlists' }, () => { say('♡ Item added to a wishlist'); load() }).subscribe(); return () => { sb.removeChannel(ch) } }, [load, say])
   useEffect(() => {
     let t; const reset = () => { clearTimeout(t); t = setTimeout(() => sb.auth.signOut(), IDLE) }, ev = ['pointerdown', 'keydown', 'scroll']
     ev.forEach(e => addEventListener(e, reset, { passive: true })); reset()
@@ -125,6 +125,14 @@ function Orders({ d: { orders }, reload, say }) {
     setBusy(true); const { error } = await sb.from('orders').update({ status: s }).eq('id', o.id); setBusy(false)
     if (error) return say(error.message); say(`#${o.order_no} → ${STEPS[s]}`); reload()
   }
+  const setPay = async (o, ok) => {
+    if (busy) return
+    if (!ok && !confirm('Reject this Transaction ID? The customer will be able to submit it again.')) return
+    setBusy(true)
+    const { error } = await sb.from('orders').update(ok ? { payment_status: 'paid', payment_ref: o.bkash_trx } : { payment_status: 'unpaid', bkash_trx: null, bkash_sender: null, bkash_submitted_at: null }).eq('id', o.id)
+    setBusy(false); if (error) return say(error.message)
+    say(ok ? `#${o.order_no} payment verified ✓` : `#${o.order_no} payment rejected`); reload()
+  }
   const csv = () => {
     const c = v => { v = String(v ?? ''); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"' }
     const rows = [['Order', 'Date', 'Customer', 'Phone', 'Address', 'Items', 'Payment', 'Status', 'Total'], ...list.map(o => [o.order_no, o.created_at, o.address?.name, o.address?.phone, o.address?.address, (o.items || []).map(i => `${i.name}${i.variant ? ' (' + i.variant + ')' : ''} x${i.qty}`).join('; '), o.payment, STEPS[o.status || 0], o.total])]
@@ -143,7 +151,7 @@ function Orders({ d: { orders }, reload, say }) {
         <button className="ob-main" onClick={() => setSel(o.id)}>
           <span className="av">{ini(o.address?.name)}</span>
           <span className="g1"><b>{o.address?.name || 'Customer'} {st === 0 && <i className="nw">NEW</i>}</b><small>#{o.order_no} · {ago(o.created_at)}</small><span className="its">{its.map(i => `${i.name}${i.qty > 1 ? ' ×' + i.qty : ''}`).join(', ') || 'No items'}</span></span>
-          <span className="rt"><b>{taka(o.total)}</b><small>{n} item{n === 1 ? '' : 's'} · {o.payment}{o.payment_status === 'paid' ? ' ✓ Paid' : ''}</small><span className={'pl s' + st}>{STEPS[st]}</span></span>
+          <span className="rt"><b>{taka(o.total)}</b><small>{n} item{n === 1 ? '' : 's'} · {o.payment}{o.payment_status === 'paid' ? ' ✓ Paid' : o.payment_status === 'verifying' ? ' · ⏳ Verify' : ''}</small><span className={'pl s' + st}>{STEPS[st]}</span></span>
         </button>
         {st < 3 ? <div className="oa"><small>📍 {o.address?.address || 'No address'}</small><button className="bt sm" disabled={busy} onClick={() => setStatus(o, st + 1)}>{NEXT[st]} →</button></div> : <div className="oa"><small>📍 {o.address?.address || 'No address'}</small><span className="ok">✓ Completed</span></div>}
       </article>
@@ -152,6 +160,14 @@ function Orders({ d: { orders }, reload, say }) {
       <div className="steps">{STEPS.map((s, i) => <button key={s} disabled={busy} className={(cur.status || 0) === i ? 'on' : (cur.status || 0) > i ? 'dn' : ''} onClick={() => setStatus(cur, i)}>{(cur.status || 0) > i ? '✓ ' : ''}{s}</button>)}</div>
       <div className="cu"><span className="av lg">{ini(cur.address?.name)}</span><span className="g1"><b>{cur.address?.name}</b><small>{cur.address?.phone}</small></span><span className={'pl s' + (cur.status || 0)}>{STEPS[cur.status || 0]}</span></div>
       <div className="acts"><a className="bt sm" href={cur.address?.phone ? 'tel:' + cur.address.phone : undefined}>📞 Call</a><a className="bt g sm" href={wa(cur.address?.phone)} target="_blank" rel="noopener noreferrer">💬 WhatsApp</a><button className="bt g sm" onClick={() => print()}>🖨 Print</button></div>
+      {cur.payment === 'bKash' && <><h3>bKash payment</h3>
+        <div className={'cd bk-a' + (cur.payment_status === 'verifying' ? ' wait' : '')}>
+          {cur.payment_status === 'paid' ? <p className="ok">✓ Verified · TrxID {cur.payment_ref || cur.bkash_trx}</p>
+            : cur.bkash_trx ? <><p><small>Transaction ID</small><b>{cur.bkash_trx}</b></p><p><small>Paid from</small><b>{cur.bkash_sender}</b></p><p><small>Expected amount</small><b>{taka(cur.total)}</b></p>
+              <p className="mut">Check your bKash app or SMS: the TrxID, sender number and amount must all match before you verify.</p>
+              <div className="acts"><button className="bt sm" disabled={busy} onClick={() => setPay(cur, true)}>✓ Verify payment</button><button className="bt d sm" disabled={busy} onClick={() => setPay(cur, false)}>Reject</button><button className="bt g sm" onClick={() => { navigator.clipboard?.writeText(cur.bkash_trx).then(() => say('TrxID copied'), () => say('Could not copy')) }}>Copy TrxID</button></div></>
+            : <p className="wn">Customer has not submitted a Transaction ID yet.</p>}
+        </div></>}
       <h3>Delivery address</h3>
       <div className="cd ad"><p>{cur.address?.address || '—'}</p>{cur.address?.note && <p className="mut">Note: {cur.address.note}</p>}<button className="bt g sm" onClick={() => { navigator.clipboard?.writeText(cur.address?.address || '').then(() => say('Address copied'), () => say('Could not copy')) }}>Copy address</button></div>
       <h3>Items</h3>
