@@ -382,7 +382,7 @@ function useLiquid() {
 }
 
 const Pic = memo(({ p, big }) => <div className={big ? 'big' : 'pic'}>{p.image_url ? <img src={p.image_url} alt={p.name} loading="lazy" decoding="async" /> : p.emoji || '🛍️'}</div>)
-// Brand-aware icon: the 🛡️ emoji (or an image URL) renders as the real MyShield logo mark
+// Brand-aware icon: the 🛡️ emoji (or an image URL) renders as the real MyShyld logo mark
 const Glyph = ({ v }) => (v === '🛡️' || v === '🛡' || /^(https?:|\/)/.test(v || '')) ? <img src={/^(https?:|\/)/.test(v) ? v : '/logo-mark.webp?v=2'} alt="" decoding="async" draggable="false" /> : <>{v}</>
 const ICONS = {
   heart: <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />,
@@ -452,7 +452,7 @@ function Money({ v }) {
 
 function BannerImpl({ shop }) {
   const [list, setList] = useState(OFFERS), [i, setI] = useState(0)
-  useEffect(() => { let on = true; api.getHero().then(h => { if (on && h?.length) { setList(h.map(x => [x.chip || 'MyShield', x.lines, x.image || x.emoji || '🛡️'])); setI(0) } }).catch(() => {}); return () => { on = false } }, [])
+  useEffect(() => { let on = true; api.getHero().then(h => { if (on && h?.length) { setList(h.map(x => [x.chip || 'MyShyld', x.lines, x.image || x.emoji || '🛡️'])); setI(0) } }).catch(() => {}); return () => { on = false } }, [])
   useEffect(() => { if (list.length < 2) return; const t = setInterval(() => { if (!document.hidden) setI(x => (x + 1) % list.length) }, 3500); return () => clearInterval(t) }, [list])
   const o = list[i % list.length]
   return <div className="bw"><div className="banner"><div key={i} className="bt"><span className="bchip">{o[0]}</span><h3>{o[1].split('|').map((l, k) => <span key={k}>{l}</span>)}</h3><button className="bshop" onClick={() => shop('categories')}>Shop Now<i>↗</i></button></div><div key={'e' + i} className="be"><Glyph v={o[2]} /></div></div><div className="bd">{list.map((_, k) => <i key={k} className={k === i % list.length ? 'on' : ''} />)}</div></div>
@@ -460,7 +460,7 @@ function BannerImpl({ shop }) {
 
 const Banner = memo(BannerImpl)
 
-const Nav = memo(({ s, count, tab }) => <nav className={'nav' + (TABS.includes(s) ? '' : ' hide-m')}><div className="nv-brand"><img src="/logo-full.webp?v=2" width="150" height="134" alt="MyShield" decoding="async" /></div>{NAV.map(([k, ic, l]) => <button key={k} className={s === k ? 'on' : ''} aria-current={s === k ? 'page' : undefined} onClick={() => tab(k)}><span><Icon n={ic} /></span>{l}{k === 'cart' && count > 0 && <em key={count}>{count}</em>}</button>)}</nav>)
+const Nav = memo(({ s, count, tab }) => <nav className={'nav' + (TABS.includes(s) ? '' : ' hide-m')}><div className="nv-brand"><img src="/logo-full.webp?v=2" width="150" height="134" alt="MyShyld" decoding="async" /></div>{NAV.map(([k, ic, l]) => <button key={k} className={s === k ? 'on' : ''} aria-current={s === k ? 'page' : undefined} onClick={() => tab(k)}><span><Icon n={ic} /></span>{l}{k === 'cart' && count > 0 && <em key={count}>{count}</em>}</button>)}</nav>)
 
 const ProductCard = memo(({ p, i, add, open, liked, like }) => <div className="card rise" style={{ '--i': Math.min(i, 12) }} onClick={() => open(p)}><Heart on={liked} toggle={() => like(p.id)} /><Pic p={p} />
   <div className="cinfo"><small>{p.tag || p.brand}</small><h4>{p.name}</h4><div className="cfoot"><b>{taka(p.price)}</b><button className="add" aria-label="Add to cart" onClick={e => { e.stopPropagation(); add(p) }}>+</button></div></div></div>)
@@ -645,7 +645,7 @@ const Profile = memo(({ user, admin, count, wishCount, place, hasAddr, tab, go, 
   const cols = useMemo(() => [
     [['Account', [['receipt', 'My Orders', 'Track your deliveries', () => tab('orders'), 't1'], ['heart', 'Wishlist', `${wishCount} saved item${wishCount === 1 ? '' : 's'}`, () => go('wishlist'), 't2'], ['pin', 'Addresses', hasAddr ? place : 'Set your delivery address', () => go('address'), 't3'], ['card', 'Payment Methods', 'Cards & mobile wallets', null, 't1']]]],
     [...(admin ? [['Store admin', [['grid', 'Manage Categories & Products', 'Add or remove items', () => go('manage'), 't2']]]] : []),
-      ['Support', [['lock', 'Privacy & Help', 'Your data, your control', null, 't3'], ['info', 'About MyShield', 'Our story & version', null, 't2']]]],
+      ['Support', [['lock', 'Privacy & Help', 'Your data, your control', null, 't3'], ['info', 'About MyShyld', 'Our story & version', null, 't2']]]],
   ], [admin, wishCount, tab, go, hasAddr, place])
   return <div className="scr narrow pf">
     <div className="pf-hero"><div className="pf-av"><div className="av">{(user?.name || 'G')[0].toUpperCase()}</div></div>
@@ -897,7 +897,7 @@ export default function App() {
   const adminDo = async (fn, ok) => { if (!admin) return; try { await fn(); await load(); say(ok) } catch (e) { say(e?.message || 'Something went wrong. Try again.') } }
 
   let body
-  if (s === 'splash') return <div className="app"><div className="splash"><div className="lgcard"><img src="/logo-full.webp?v=2" width="220" height="197" alt="MyShield" fetchpriority="high" decoding="async" /></div><div>Privacy. Confidence. Comfort. Wellness.</div><div className="sbar"><i /></div></div></div>
+  if (s === 'splash') return <div className="app"><div className="splash"><div className="lgcard"><img src="/logo-full.webp?v=2" width="220" height="197" alt="MyShyld" fetchpriority="high" decoding="async" /></div><div>Privacy. Confidence. Comfort. Wellness.</div><div className="sbar"><i /></div></div></div>
 
   if (s === 'ob') { const o = OB[ob]; body = <div className="ob">
     <div className="row"><span /><button onClick={() => tab('auth')} style={{ color: '#8b8197' }}>Skip</button></div>
@@ -907,10 +907,10 @@ export default function App() {
 
   if (s === 'auth') body = <div className="auth">
     <div className="blobs" aria-hidden="true"><i /><i /><i /></div>
-    <header className="abar"><span className="am"><img src="/logo-mark.webp?v=2" width="34" height="34" alt="" decoding="async" draggable="false" /></span><div className="an"><h1>MyShield</h1><small>Privacy. Confidence. Comfort. Wellness.</small></div><span className="ap"><Icon n="lock" />Private</span></header>
+    <header className="abar"><span className="am"><img src="/logo-mark.webp?v=2" width="34" height="34" alt="" decoding="async" draggable="false" /></span><div className="an"><h1>MyShyld</h1><small>Privacy. Confidence. Comfort. Wellness.</small></div><span className="ap"><Icon n="lock" />Private</span></header>
     <div className="auth-in">
       <form className={'auth-card glass' + (shake ? ' shake' : '')} onSubmit={login} noValidate>
-        {(mode === 'login' || mode === 'signup') && <div className="ah"><h2>{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2><p>{mode === 'login' ? 'Log in to continue shopping privately.' : 'Join MyShield for discreet delivery across Chattogram.'}</p></div>}
+        {(mode === 'login' || mode === 'signup') && <div className="ah"><h2>{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2><p>{mode === 'login' ? 'Log in to continue shopping privately.' : 'Join MyShyld for discreet delivery across Chattogram.'}</p></div>}
         {(mode === 'login' || mode === 'signup') && <div className="tabs" data-i={mode === 'login' ? 0 : 1}>{['login', 'signup'].map(m => <button type="button" key={m} className={mode === m ? 'on' : ''} onClick={() => setMode(m)}>{m === 'login' ? 'Login' : 'Sign Up'}</button>)}</div>}
         {mode === 'forgot' && <p className="msg"><b>Reset your password</b><br />Enter your account email and we will send you a reset link.</p>}
         {mode === 'reset' && <p className="msg"><b>Set a new password</b><br />Choose a new password for your account.</p>}
@@ -976,7 +976,7 @@ export default function App() {
   }} />
 
   if (s === 'done') body = <div className="scr ok narrow"><div className="tick">✓</div><h2 style={{ margin: '24px 0 4px' }}>Order Placed Successfully!</h2><div className="pill">Order #{cur.order.order_no}</div>
-    <p style={{ color: '#8b8197', marginBottom: 30 }}>Thank you for choosing MyShield.<br />{cur.order.payment_status === 'verifying' ? 'We are verifying your bKash payment. We will confirm your order shortly.' : 'Your order will be delivered soon.'}</p>
+    <p style={{ color: '#8b8197', marginBottom: 30 }}>Thank you for choosing MyShyld.<br />{cur.order.payment_status === 'verifying' ? 'We are verifying your bKash payment. We will confirm your order shortly.' : 'Your order will be delivered soon.'}</p>
     <button className="btn" onClick={() => go('tracking', { order: cur.order })}>Track Order</button><button className="btn o" style={{ marginTop: 12 }} onClick={() => tab('home')}>Continue Shopping</button></div>
 
   if (s === 'orders') { const stOf = o => liveSt[o.order_no] ?? (o.status || 0), list = orders.filter(o => oflt === 'all' || (oflt === 'active') === (stOf(o) < 3))
@@ -1028,10 +1028,10 @@ function ProductScreen({ p, back, addToCart, count, go, liked, like, prods = [],
   const sugg = useMemo(() => suggest(prods, [p], new Set([p.id]), 8), [prods, p])
   return <><Hdr title="Details" back={back} right={<button className="ib" aria-label="Open cart" onClick={() => go('cart')}><Icon n="bag" />{count > 0 && <em className="cb" key={count}>{count}</em>}</button>} />
     <div className="scr pd"><div className="pdp"><Pic p={p} big /><div className="fadeUp pdp-info">
-      <small className="pk">{[p.brand, p.tag].filter(Boolean).join(' · ') || 'MyShield'}</small>
+      <small className="pk">{[p.brand, p.tag].filter(Boolean).join(' · ') || 'MyShyld'}</small>
       <div className="row"><h3>{p.name}</h3><Heart on={liked} toggle={() => like(p.id)} inl /></div>
       <small style={{ color: '#8b8197' }}>★ {p.rating} ({p.reviews > 999 ? (p.reviews / 1000).toFixed(1) + 'k' : p.reviews} reviews)</small>
-      <div className="store"><span className="sl"><Glyph v="🛡️" /></span><div><b>MyShield Store<i className="vf">✓</i></b><small>Official store</small></div><span className="fl">Verified</span></div>
+      <div className="store"><span className="sl"><Glyph v="🛡️" /></span><div><b>MyShyld Store<i className="vf">✓</i></b><small>Official store</small></div><span className="fl">Verified</span></div>
       <div className="opt"><div className="opt-l">{multi && <><span>Select option</span><div className="var">{p.variants.map(x => <button key={x.label} className={v?.label === x.label ? 'on' : ''} onClick={() => setV(x)}>{x.label}</button>)}</div></>}</div>
         <div className="opt-r"><span>QTY</span><div className="qty"><button aria-label="Decrease" onClick={() => setN(x => Math.max(1, x - 1))}>−</button><span className="qn">{n}</span><button aria-label="Increase" onClick={() => setN(x => Math.min(20, x + 1))}>+</button></div></div></div>
       <div className="dsc"><h5>Description</h5><ul className="ck">{(p.features || []).map(f => <li key={f}>{f}</li>)}</ul></div></div></div>
