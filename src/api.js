@@ -17,6 +17,9 @@ const sv = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch 
 // ---------------- Small safe helpers ----------------
 const str = (v, max = 200) => String(v ?? '').trim().slice(0, max)
 const mail = v => str(v, 254).toLowerCase()
+const coord = v => (typeof v === 'number' && Number.isFinite(v) ? v : null)
+// lat/lng let the server price delivery by distance. Missing/invalid values become null (never 0,0).
+const cleanAddr = a => ({ name: str(a?.name, 80), phone: str(a?.phone, 20), address: str(a?.address, 300), note: str(a?.note, 300), lat: coord(a?.lat), lng: coord(a?.lng) })
 const isUuid = v => typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
 
 export async function getCategories() {
@@ -157,10 +160,7 @@ export function onAuthChange(cb) {
 export async function placeOrder(o) {
   const items = (Array.isArray(o?.items) ? o.items : []).map(i => ({ id: i.id, variant: i.variant || null, qty: i.qty }))
   const promo = str(o?.promo ?? o?.promo_code ?? '', 40)
-  const address = {
-    name: str(o?.address?.name, 80), phone: str(o?.address?.phone, 20),
-    address: str(o?.address?.address, 300), note: str(o?.address?.note, 300),
-  }
+  const address = cleanAddr(o?.address)
   if (supabase && o?.user_id && o.user_id !== 'local') {
     if (!items.length) throw new Error('Your cart is empty.')
     const { data, error } = await supabase.rpc('place_order', { p_items: items, p_promo: promo, p_address: address, p_payment: 'Cash on Delivery' })
@@ -175,7 +175,7 @@ export async function placeOrder(o) {
 const friendlyOrder = e => {
   const m = String(e?.message || '')
   // messages raised on purpose by place_order() are safe and useful to show
-  if (/cart|stock|available|option|quantity|delivery details|Too many|sign in|total|choose/i.test(m)) return m
+  if (/cart|stock|available|option|quantity|delivery details|deliver inside|Too many|sign in|total|choose/i.test(m)) return m
   return 'Could not place your order. Please try again.'
 }
 export async function getOrders(uid) {
@@ -198,7 +198,7 @@ export async function getHero() {
 export async function startOnlinePayment({ provider, items, promo, address }) {
   if (!supabase) throw new Error('Online payment is unavailable right now.')
   const { data, error } = await supabase.functions.invoke('pay-create', {
-    body: { provider, promo, address, items: items.map(i => ({ id: i.id, variant: i.variant, qty: i.qty })) },
+    body: { provider, promo, address: cleanAddr(address), items: items.map(i => ({ id: i.id, variant: i.variant, qty: i.qty })) },
   })
   if (error) {
     let msg = ''
@@ -235,8 +235,8 @@ export async function placeBkashOrder(o) {
   if (!supabase) throw new Error('Please sign in to pay with bKash.')
   const items = (Array.isArray(o?.items) ? o.items : []).map(i => ({ id: i.id, variant: i.variant || null, qty: i.qty }))
   if (!items.length) throw new Error('Your cart is empty.')
-  const address = { name: str(o?.address?.name, 80), phone: str(o?.address?.phone, 20), address: str(o?.address?.address, 300), note: str(o?.address?.note, 300) }
+  const address = cleanAddr(o?.address)
   const { data, error } = await supabase.rpc('place_bkash_order', { p_items: items, p_promo: str(o?.promo, 40), p_address: address, p_amount: Number(o?.amount) || 0, p_trx: str(o?.trx, 30), p_sender: str(o?.sender, 20) })
-  if (error) { const m = String(error.message || ''); throw new Error(/Transaction ID|bKash number|amount|sign in/i.test(m) ? m : friendlyOrder(error)) }
+  if (error) { const m = String(error.message || ''); throw new Error(/Transaction ID|bKash number|amount|sign in|deliver inside/i.test(m) ? m : friendlyOrder(error)) }
   return data
 }
