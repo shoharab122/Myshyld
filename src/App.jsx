@@ -5,9 +5,9 @@ const taka = n => '৳' + Math.round(n).toLocaleString()
 const NAV = [['home', 'home', 'Home'], ['categories', 'grid', 'Categories'], ['cart', 'bag', 'Cart'], ['orders', 'receipt', 'Orders'], ['profile', 'user', 'Profile']]
 const TABS = NAV.map(n => n[0])
 const OB = [
-  { e: '👩‍🦰', t: ['Your Privacy', 'Our Priority'], d: 'Get essential personal care products delivered to your doorstep, discreetly and safely.' },
+  { e: 'art:privacy', t: ['Your Privacy', 'Our Priority'], d: 'Get essential personal care products delivered to your doorstep, discreetly and safely.' },
   { e: '🛡️', t: ['Daily Essentials', 'Without the Awkwardness'], d: 'Condoms and sanitary pads, all variants, delivered with dignity.' },
-  { e: '📦', t: ['Discreet Delivery', 'Across Chattogram'], d: 'Plain packaging. No product name. No judgment.' },
+  { e: 'art:delivery', t: ['Discreet Delivery', 'Across Chattogram'], d: 'Plain packaging. No product name. No judgment.' },
 ]
 const STEPS = ['Order Placed', 'Processing', 'Out for Delivery', 'Delivered']
 const PAYS = [['Cash on Delivery', 'Pay when you receive', '💵'], ['bKash', 'Send money, then enter your TrxID', '🌸'], ['Nagad', 'Pay with Nagad', '🟠'], ['Debit/Credit Card', 'Visa, Mastercard', '💳']]
@@ -329,10 +329,35 @@ const SHOP_CSS = `
 .oc-t{flex:1;min-width:0;font-size:13px;color:var(--ink)}.oc-t span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.oc-t small{color:var(--mute);font-size:12px}
 .oc-p{font-size:16px;color:var(--p1);flex:none}
 .prg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:14px}.prg i{height:5px;border-radius:99px;background:var(--line)}.prg i.on{background:var(--grad)}
+/* ----- My Orders: mobile-first card refresh ----- */
+.ochips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:4px 4px 14px;margin:0 -4px -4px;scroll-snap-type:x proximity}
+.ochips::-webkit-scrollbar{display:none}
+.ochips button{flex:none;min-height:44px;scroll-snap-align:start;display:inline-flex;align-items:center}
+.ochips .cnt{margin-left:7px;min-width:20px;padding:1px 7px;border-radius:99px;background:#8e2a8c1a;color:var(--p1);font-size:11.5px;font-weight:700;text-align:center}
+.ochips .on .cnt{background:#ffffff38;color:#fff}
+.oc{padding:16px 16px 14px 21px;border-radius:26px;margin-bottom:14px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.oc:focus-visible{outline:3px solid #8e2a8c66;outline-offset:2px}
+.oc-h{margin-bottom:14px;align-items:center}
+.oc-h b{font-size:16px;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis}.oc-h>div{min-width:0}
+.oc-h small{display:block;margin-top:1px}
+.sp{display:inline-flex;align-items:center;font-size:12px;padding:5px 12px 5px 10px}
+.sp>i{display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:7px}
+.oc-m{padding:12px;margin:0 -4px;border-radius:18px;background:#faf6fd}
+.oc .pic img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.oc-m.one .ths .pic{width:56px;height:56px;border-radius:16px;font-size:26px}
+.oc-t span{font-size:14.5px;font-weight:700}.oc-t small{display:block;margin-top:2px}
+.oc-p{font-size:17px;font-weight:800;letter-spacing:-.01em;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.prg{gap:6px;margin-top:16px}.prg i{height:6px}
+.oc-f{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;padding-top:11px;border-top:1.5px dashed var(--line);font-size:12.5px;color:var(--mute)}
+.oc-f span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.oc-f em{flex:none;font-style:normal;font-weight:700;color:var(--p1);display:inline-flex;align-items:center;gap:2px;min-height:24px}
+.oc-f svg{width:16px;height:16px}
+@media(prefers-reduced-motion:no-preference){.sp.s0>i,.sp.s1>i,.sp.s2>i{animation:ocDot 1.8s ease-in-out infinite}}
+@keyframes ocDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+@media(max-width:380px){.oc{padding:14px 12px 12px 17px;border-radius:22px}.oc-h b{font-size:15px}.sp{font-size:11px;padding:4px 10px 4px 8px}.oc-m{padding:10px;gap:10px}.oc-p{font-size:15px}.oc-t span{font-size:13.5px}.ochips button{padding-inline:16px}}
 .tkc{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px}
 .tkc>div{background:#fff;border-radius:18px;padding:12px;box-shadow:0 6px 16px #4a166814;border:1px solid var(--edge);min-width:0}
 .tkc small{display:block;color:var(--mute);font-size:11px;margin-bottom:2px}.tkc b{font-size:14px;color:var(--ink);word-break:break-word}
-.tl{background:#fff;border-radius:24px;padding:18px 18px 0;box-shadow:0 8px 22px #4a166818;margin:14px 0}
 .cd2{background:#fff;border:1px solid var(--edge);border-radius:24px;padding:16px;margin-top:14px;box-shadow:0 8px 22px #4a166818}
 .cd2 h5{font-size:12px;color:var(--mute);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
 .ti{display:flex;gap:12px;align-items:center;padding:10px 0}.ti+.ti{border-top:1px solid var(--line)}
@@ -342,6 +367,58 @@ const SHOP_CSS = `
 @media(min-width:900px){.rail{margin-inline:-36px}.rail .sec{padding-inline:36px}.rail-s{padding-inline:36px}.rail-s .card{flex-basis:190px;width:190px}.rail-s .pic{height:150px}.oc:hover{transform:translateY(-2px)}}
 @media(max-width:360px){.item.ci .pic{width:72px;height:72px}.tkc{grid-template-columns:1fr 1fr}.tkc>div:last-child{grid-column:span 2}.rail-s .card{flex-basis:140px;width:140px}}
 @media(prefers-reduced-motion:reduce){.oc{transition:none}}
+
+/* ===== order tracking: animated progress card + grouped detail cards ===== */
+.trk{position:relative;overflow:hidden;border-radius:26px;padding:18px 18px 14px;margin:14px 0;color:#fff;background:linear-gradient(135deg,#4a1668,#8e2a8c 55%,#e0457b);box-shadow:0 18px 36px -14px #8e2a8ccc,inset 0 1.5px 0 #ffffff55}
+.trk:before,.trk:after{content:'';position:absolute;border-radius:50%;background:#ffffff1f;pointer-events:none;animation:trkOrb 9s ease-in-out infinite alternate}
+.trk:before{width:160px;height:160px;right:-50px;top:-70px}.trk:after{width:110px;height:110px;left:-40px;bottom:-60px;animation-delay:-4s}
+.trk.fin{background:linear-gradient(135deg,#1f7a4d,#2fa86a 60%,#6fd39a)}
+.trk-top{display:flex;gap:14px;align-items:center;position:relative;z-index:1}
+.trk-art{flex:none;width:64px;height:64px;border-radius:20px;background:#ffffffeb;display:grid;place-items:center;font-size:42px;box-shadow:0 10px 22px #2d0b4a40;animation:flt 3.2s ease-in-out infinite}
+.trk-tx{font-size:13px;line-height:1.45;color:#ffffffd9}.trk-tx b{font-size:17px;color:#fff;letter-spacing:-.01em}
+.trk-rail{position:relative;z-index:1;height:20px;margin:18px 10px 6px}
+.trk-line{position:absolute;left:0;right:0;top:8px;height:4px;border-radius:4px;background:#ffffff40;overflow:hidden}
+.trk-fill{display:block;height:100%;border-radius:4px;background:#fff;box-shadow:0 0 12px #fff;transform-origin:left;animation:trkGrow 1.1s var(--ease) both;position:relative;overflow:hidden}
+.trk-fill:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,#e0457b88,transparent);background-size:200% 100%;animation:sh 1.8s linear infinite}
+.trk-n{position:absolute;top:4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#ffffff59;border:2px solid #ffffff80;transition:.4s var(--spring)}
+.trk-n.on{background:#fff;border-color:#fff;transform:scale(1.15)}
+.trk-n.cur{width:20px;height:20px;top:0;margin-left:-10px;box-shadow:0 0 0 0 #ffffffaa;animation:trkRing 1.8s infinite}
+.trk-lb{position:relative;z-index:1;display:flex;justify-content:space-between;gap:4px;font-size:10px;letter-spacing:.01em}
+.trk-lb small{color:#ffffff8c;font-weight:600;text-align:center;flex:1}.trk-lb small:first-child{text-align:left}.trk-lb small:last-child{text-align:right}.trk-lb small.on{color:#fff}
+.trkscr .tk-meta,.trkscr .tk-card,.trkscr .trk,.trkscr .btn{animation:up .55s var(--ease) both}
+.trkscr .trk{animation-delay:.08s}.trkscr .tk-card:nth-of-type(1){animation-delay:.16s}.trkscr .tk-card:nth-of-type(2){animation-delay:.22s}.trkscr .tk-card:nth-of-type(3){animation-delay:.28s}
+/* order meta strip */
+.tk-meta{display:grid;grid-template-columns:1fr 1fr 1fr;background:#fff;border:1px solid var(--edge);border-radius:24px;box-shadow:0 8px 22px #4a166818;overflow:hidden}
+.tk-meta>div{padding:14px;min-width:0;display:grid;gap:2px;align-content:start}
+.tk-meta>div+div{border-left:1px solid var(--line)}
+.tk-meta small{font-size:11px;color:var(--mute);font-weight:600}
+.tk-meta b{font-size:15px;color:var(--ink);word-break:break-word}
+.tk-meta em{font-style:normal;font-size:11.5px;color:var(--mute)}
+.tk-meta b.g{font-size:17px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+/* grouped cards */
+.tk-card{background:#fff;border:1px solid var(--edge);border-radius:24px;padding:4px 16px 8px;margin-top:14px;box-shadow:0 8px 22px #4a166818}
+.tk-card>header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0 6px}
+.tk-card h5{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.01em;margin:0}
+.tk-pill{padding:4px 11px;border-radius:999px;background:#f6effb;color:var(--p1);font-size:12px;font-weight:700}
+.tk-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0}.tk-row+.tk-row{border-top:1px solid var(--line)}
+.tk-ic{flex:none;width:40px;height:40px;border-radius:14px;display:grid;place-items:center;background:var(--grad);color:#fff;box-shadow:0 6px 14px #8e2a8c40}
+.tk-row>div{flex:1;min-width:0}.tk-row small{display:block;color:var(--mute);font-size:12px;margin-bottom:1px}
+.tk-row b{color:var(--ink);font-size:14.5px}.tk-row p{font-size:13.5px;line-height:1.5;color:var(--ink);margin:2px 0 0}
+.tk-row em{display:block;font-style:normal;font-size:12px;color:var(--mute);margin-top:4px}
+.tk-chip{flex:none;align-self:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700}
+.tk-chip.ok{background:#e4f7ec;color:#1f7a4d}.tk-chip.wait{background:#fff3dc;color:#a86a00}.tk-chip.no{background:#fde7ee;color:#c0245a}
+/* bill */
+.tk-bill .r{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:14px;color:var(--mute)}
+.tk-bill .r span:last-child{color:var(--ink);font-weight:600;text-align:right}
+.tk-bill .r.g span:last-child{color:#3ab36b;font-weight:700}
+.tk-bill .tot{display:flex;justify-content:space-between;align-items:baseline;margin:8px -16px -8px;padding:14px 16px;border-top:1.5px dashed var(--line);background:linear-gradient(#faf5fd,#f6effb);border-radius:0 0 23px 23px}
+.tk-bill .tot span:first-child{font-weight:700;color:var(--ink);font-size:15px}
+.tk-bill .tot span:last-child{font-size:21px;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+@media(max-width:360px){.tk-meta b{font-size:13px}.tk-meta b.g{font-size:14px}.tk-meta>div{padding:12px 10px}}
+@keyframes trkGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes trkRing{0%{box-shadow:0 0 0 0 #ffffffaa}100%{box-shadow:0 0 0 14px #ffffff00}}
+@keyframes trkOrb{to{transform:translate3d(-24px,18px,0) scale(1.2)}}
+@media(prefers-reduced-motion:reduce){.trk *,.trk:before,.trk:after,.trkscr *{animation:none!important}}
 `
 const POP = '.add,.fab,.qty button,.ib'
 
@@ -383,7 +460,113 @@ function useLiquid() {
 
 const Pic = memo(({ p, big }) => <div className={big ? 'big' : 'pic'}>{p.image_url ? <img src={p.image_url} alt={p.name} loading="lazy" decoding="async" /> : p.emoji || '🛍️'}</div>)
 // Brand-aware icon: the 🛡️ emoji (or an image URL) renders as the real MyShyld logo mark
-const Glyph = ({ v }) => (v === '🛡️' || v === '🛡' || /^(https?:|\/)/.test(v || '')) ? <img src={/^(https?:|\/)/.test(v) ? v : '/logo-mark.webp?v=2'} alt="" decoding="async" draggable="false" /> : <>{v}</>
+// Small illustrations for empty states and order-status banner (inline SVG, brand colors)
+const CartArt = () => (
+  <svg viewBox="0 0 120 120" width="1em" height="1em" role="img" aria-label="Empty cart" style={{ display: 'block' }}>
+    <defs>
+      <linearGradient id="caa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#a23fb8" /><stop offset="1" stopColor="#ec4a7c" /></linearGradient>
+      <linearGradient id="cab" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ffe3ef" /><stop offset="1" stopColor="#f79ac0" /></linearGradient>
+      <linearGradient id="cac" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#6fd39a" /><stop offset="1" stopColor="#2fa86a" /></linearGradient>
+    </defs>
+    <path d="M14 30 h16 l10 46 h46 l10 -34 H36" fill="none" stroke="url(#caa)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M36 42 h60 l-9 34 H44 z" fill="url(#cab)" opacity=".9" />
+    <circle cx="50" cy="94" r="8" fill="url(#caa)" /><circle cx="82" cy="94" r="8" fill="url(#caa)" />
+    <circle cx="50" cy="94" r="3" fill="#fff" /><circle cx="82" cy="94" r="3" fill="#fff" />
+    <path d="M66 14 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 z" fill="#ec4a7c" opacity=".8" />
+    <path d="M100 20 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" fill="#a23fb8" opacity=".6" />
+  </svg>
+)
+const OrdersArt = () => (
+  <svg viewBox="0 0 120 120" width="1em" height="1em" role="img" aria-label="No orders yet" style={{ display: 'block' }}>
+    <defs>
+      <linearGradient id="oaa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#a23fb8" /><stop offset="1" stopColor="#ec4a7c" /></linearGradient>
+      <linearGradient id="oab" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ffe3ef" /><stop offset="1" stopColor="#f79ac0" /></linearGradient>
+      <linearGradient id="oac" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#6fd39a" /><stop offset="1" stopColor="#2fa86a" /></linearGradient>
+    </defs>
+    <g strokeLinejoin="round">
+      <path d="M60 34 L96 50 V82 L60 98 L24 82 V50 Z" fill="#8e3bb8" />
+      <path d="M60 34 L96 50 V82 L60 98 Z" fill="url(#oaa)" />
+      <path d="M60 34 L96 50 L60 66 L24 50 Z" fill="url(#oab)" />
+      <path d="M60 34 L78 42 L42 58 L24 50 Z" fill="#fff" opacity=".55" />
+    </g>
+    <path d="M60 66 V98" stroke="#fff" strokeOpacity=".35" strokeWidth="2" />
+    <path d="M94 16 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 z" fill="#ec4a7c" opacity=".8" />
+    <path d="M16 28 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" fill="#a23fb8" opacity=".6" />
+  </svg>
+)
+const StatusArt = ({ st }) => (
+  <svg viewBox="0 0 120 120" width="1.2em" height="1.2em" role="img" aria-label="Order status" style={{ display: 'block' }}>
+    <defs>
+      <linearGradient id="saa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#a23fb8" /><stop offset="1" stopColor="#ec4a7c" /></linearGradient>
+      <linearGradient id="sab" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ffe3ef" /><stop offset="1" stopColor="#f79ac0" /></linearGradient>
+      <linearGradient id="sac" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#6fd39a" /><stop offset="1" stopColor="#2fa86a" /></linearGradient>
+    </defs>
+    {st === 0 && <><rect x="26" y="20" width="68" height="84" rx="14" fill="url(#sab)" /><rect x="40" y="12" width="40" height="18" rx="8" fill="url(#saa)" /><path d="M42 54 h36 M42 70 h36 M42 86 h22" stroke="#d93d7a" strokeWidth="6" strokeLinecap="round" opacity=".75" /></>}
+    {st === 1 && <><g strokeLinejoin="round"><path d="M60 26 L98 43 V80 L60 98 L22 80 V43 Z" fill="#8e3bb8" /><path d="M60 26 L98 43 V80 L60 98 Z" fill="url(#saa)" /><path d="M60 26 L98 43 L60 60 L22 43 Z" fill="url(#sab)" /></g></>}
+    {st === 2 && <><path d="M8 62 h22 M14 78 h20 M20 94 h16" stroke="#e8b9d0" strokeWidth="6" strokeLinecap="round" /><path d="M44 40 h38 l16 22 v28 H44 z" fill="url(#saa)" /><path d="M82 48 l10 14 H74 V48 z" fill="#fff" opacity=".6" /><circle cx="58" cy="94" r="10" fill="#4a1a6b" /><circle cx="88" cy="94" r="10" fill="#4a1a6b" /><circle cx="58" cy="94" r="4" fill="#fff" /><circle cx="88" cy="94" r="4" fill="#fff" /></>}
+    {st >= 3 && <><circle cx="60" cy="60" r="44" fill="url(#sac)" /><circle cx="60" cy="60" r="44" fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth="3" /><path d="M38 61 l15 15 29 -32" fill="none" stroke="#fff" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" /></>}
+  </svg>
+)
+// Custom illustration for the first onboarding slide: glass shield, heart + lock, floating gift box and sparkles
+const PrivacyArt = () => (
+  <svg viewBox="0 0 200 200" width="1.15em" height="1.15em" role="img" aria-label="Private and safe delivery" style={{ display: 'block' }}>
+    <defs>
+      <linearGradient id="pa-sh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#a23fb8" /><stop offset="1" stopColor="#ec4a7c" /></linearGradient>
+      <linearGradient id="pa-gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#fff" stopOpacity=".55" /><stop offset="1" stopColor="#fff" stopOpacity="0" /></linearGradient>
+      <linearGradient id="pa-bx" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ffd1e3" /><stop offset="1" stopColor="#f79ac0" /></linearGradient>
+      <filter id="pa-bl" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="8" stdDeviation="8" floodColor="#c23a78" floodOpacity=".35" /></filter>
+    </defs>
+    <circle cx="100" cy="104" r="78" fill="#fff" opacity=".35" />
+    <g filter="url(#pa-bl)">
+      <path d="M100 26 L154 46 V98 C154 136 130 160 100 174 C70 160 46 136 46 98 V46 Z" fill="url(#pa-sh)" />
+      <path d="M100 26 L154 46 V98 C154 136 130 160 100 174 C70 160 46 136 46 98 V46 Z" fill="url(#pa-gl)" />
+      <path d="M100 38 L143 54 V98 C143 129 124 149 100 161 C76 149 57 129 57 98 V54 Z" fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth="2" />
+    </g>
+    <path d="M100 126 C82 114 76 104 76 94 a13 13 0 0 1 24 -6 a13 13 0 0 1 24 6 c0 10 -6 20 -24 32 z" fill="#fff" />
+    <rect x="92" y="88" width="16" height="13" rx="3.5" fill="#d93d7a" />
+    <path d="M95 88 v-4 a5 5 0 0 1 10 0 v4" fill="none" stroke="#d93d7a" strokeWidth="3" strokeLinecap="round" />
+    <g transform="translate(138 126) rotate(8)">
+      <rect width="42" height="36" rx="8" fill="url(#pa-bx)" /><rect y="12" width="42" height="6" fill="#fff" opacity=".7" /><rect x="18" width="6" height="36" fill="#fff" opacity=".7" />
+      <path d="M21 0 c-8 -12 -18 -2 -8 0 z M21 0 c8 -12 18 -2 8 0 z" fill="#fff" />
+    </g>
+    <path d="M40 60 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 z" fill="#fff" />
+    <path d="M168 54 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" fill="#fff" opacity=".9" />
+    <circle cx="32" cy="130" r="4" fill="#fff" opacity=".8" /><circle cx="172" cy="100" r="3" fill="#fff" opacity=".7" />
+  </svg>
+)
+// Custom illustration for the third onboarding slide: plain unbranded parcel, location pin, speed lines, "delivered" badge
+const DeliveryArt = () => (
+  <svg viewBox="0 0 200 200" width="1.15em" height="1.15em" role="img" aria-label="Plain, discreet delivery" style={{ display: 'block' }}>
+    <defs>
+      <linearGradient id="da-top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ffe3ef" /><stop offset="1" stopColor="#f9b4d0" /></linearGradient>
+      <linearGradient id="da-l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#c45bd0" /><stop offset="1" stopColor="#8e3bb8" /></linearGradient>
+      <linearGradient id="da-r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ec4a7c" /><stop offset="1" stopColor="#b02f93" /></linearGradient>
+      <linearGradient id="da-pin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#a23fb8" /><stop offset="1" stopColor="#ec4a7c" /></linearGradient>
+      <filter id="da-sh" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="8" stdDeviation="7" floodColor="#c23a78" floodOpacity=".35" /></filter>
+    </defs>
+    <ellipse cx="100" cy="166" rx="52" ry="9" fill="#b02f93" opacity=".18" />
+    <g stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity=".85">
+      <path d="M18 104 H48" /><path d="M10 120 H40" opacity=".7" /><path d="M24 136 H50" opacity=".5" />
+    </g>
+    <g filter="url(#da-sh)" strokeLinejoin="round">
+      <path d="M100 82 L152 104 V146 L100 168 L48 146 V104 Z" fill="url(#da-l)" />
+      <path d="M100 82 L152 104 V146 L100 168 Z" fill="url(#da-r)" />
+      <path d="M100 82 L152 104 L100 126 L48 104 Z" fill="url(#da-top)" />
+      <path d="M100 82 L126 93 L74 115 L48 104 Z" fill="#fff" opacity=".55" />
+      <path d="M100 126 L100 168" stroke="#fff" strokeOpacity=".35" strokeWidth="2" />
+    </g>
+    <path d="M100 82 L152 104 L100 126 L48 104 Z" fill="none" stroke="#fff" strokeOpacity=".8" strokeWidth="1.5" strokeLinejoin="round" />
+    <g filter="url(#da-sh)">
+      <path d="M100 20 c-17 0 -28 12 -28 27 c0 20 28 42 28 42 s28 -22 28 -42 c0 -15 -11 -27 -28 -27 z" fill="url(#da-pin)" />
+      <circle cx="100" cy="47" r="11" fill="#fff" />
+      <path d="M94.5 47.5 l4 4 7.5 -8" fill="none" stroke="#d93d7a" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
+    </g>
+    <path d="M160 62 l2.5 6.5 6.5 2.5 -6.5 2.5 -2.5 6.5 -2.5 -6.5 -6.5 -2.5 6.5 -2.5 z" fill="#fff" />
+    <path d="M40 64 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" fill="#fff" opacity=".9" />
+    <circle cx="170" cy="130" r="4" fill="#fff" opacity=".8" /><circle cx="30" cy="160" r="3" fill="#fff" opacity=".7" />
+  </svg>
+)
+const Glyph = ({ v }) => v === 'art:privacy' ? <PrivacyArt /> : v === 'art:delivery' ? <DeliveryArt /> : (v === '🛡️' || v === '🛡' || /^(https?:|\/)/.test(v || '')) ? <img src={/^(https?:|\/)/.test(v) ? v : '/logo-mark.webp?v=2'} alt="" decoding="async" draggable="false" /> : <>{v}</>
 const ICONS = {
   heart: <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />,
   pin: <><path d="M12 21s-6-5.2-6-10a6 6 0 0 1 12 0c0 4.8-6 10-6 10z" /><circle cx="12" cy="11" r="2.2" /></>,
@@ -634,12 +817,14 @@ const CartItem = memo(({ i, qty }) => <div className="item ci rise"><Pic p={i} /
     <div className="ci-f"><span className="ci-p"><b>{taka(i.price * i.qty)}</b>{i.qty > 1 && <small>{taka(i.price)} each</small>}</span>
       <div className="qty"><button aria-label="Decrease" onClick={() => qty(i.key, -1)}>−</button><span>{i.qty}</span><button aria-label="Increase" onClick={() => qty(i.key, 1)}>+</button></div></div></div></div>)
 
+const HINT = ['Waiting for confirmation', 'Being prepared for you', 'On its way to you', 'Delivered. Enjoy!']
 const OrderCard = ({ o, st, open }) => { const its = o.items || [], n = its.reduce((a, i) => a + (i.qty || 1), 0), names = its.slice(0, 2).map(i => i.name).join(', ')
-  return <div className={'oc rise s' + st} role="button" tabIndex={0} onClick={() => open(o)} onKeyDown={e => e.key === 'Enter' && open(o)}>
-    <div className="oc-h"><div><b>#{o.order_no}</b><small>{new Date(o.created_at).toLocaleDateString([], { dateStyle: 'medium' })}</small></div><span className={'sp s' + st}>{STEPS[st]}</span></div>
-    <div className="oc-m"><div className="ths">{its.slice(0, 3).map((i, k) => <Pic key={k} p={i} />)}{its.length > 3 && <span className="more">+{its.length - 3}</span>}</div>
+  return <div className={'oc rise s' + st} role="button" tabIndex={0} aria-label={`Order ${o.order_no}, ${STEPS[st]}`} onClick={() => open(o)} onKeyDown={e => e.key === 'Enter' && open(o)}>
+    <div className="oc-h"><div><b>#{o.order_no}</b><small>{new Date(o.created_at).toLocaleDateString([], { dateStyle: 'medium' })}</small></div><span className={'sp s' + st}><i />{STEPS[st]}</span></div>
+    <div className={'oc-m' + (its.length === 1 ? ' one' : '')}><div className="ths">{its.slice(0, 3).map((i, k) => <Pic key={k} p={i} />)}{its.length > 3 && <span className="more">+{its.length - 3}</span>}</div>
       <div className="oc-t"><span>{names || 'Order'}{its.length > 2 ? ` +${its.length - 2} more` : ''}</span><small>{n} item{n === 1 ? '' : 's'}</small></div><b className="oc-p">{taka(o.total)}</b></div>
-    <div className="prg" aria-hidden="true">{STEPS.map((_, k) => <i key={k} className={k <= st ? 'on' : ''} />)}</div></div> }
+    <div className="prg" aria-hidden="true">{STEPS.map((_, k) => <i key={k} className={k <= st ? 'on' : ''} />)}</div>
+    <div className="oc-f"><span>{HINT[st]}</span><em>{st < 3 ? 'Track order' : 'View details'}<Icon n="chev" /></em></div></div> }
 
 const Profile = memo(({ user, admin, count, wishCount, place, hasAddr, tab, go, say, onLogout }) => {
   const cols = useMemo(() => [
@@ -952,7 +1137,7 @@ export default function App() {
   if (s === 'product') body = <ProductScreen key={cur.p.id} {...{ p: cur.p, back, addToCart, count, go, like, open }} prods={prods} wish={wishSet} liked={wishSet.has(cur.p.id)} />
 
   if (s === 'cart') body = <><Hdr title={`My Cart (${count})`} back={back} right={cart.length > 0 && <button className="ib" aria-label="Clear cart" onClick={() => { setCart([]); setPromoOn(false) }}>🗑️</button>} /><div className="scr narrow">
-    {!cart.length ? <div className="emp"><div className="emp-i">🛍️</div><h3>Your cart is empty</h3><p>Browse our categories and add something you like.</p><button className="btn" onClick={() => tab('categories')}>Start shopping</button></div> : <><Steps n={0} />
+    {!cart.length ? <div className="emp"><div className="emp-i"><CartArt /></div><h3>Your cart is empty</h3><p>Browse our categories and add something you like.</p><button className="btn" onClick={() => tab('categories')}>Start shopping</button></div> : <><Steps n={0} />
       <div className="frb"><span>🚚</span><div><b>Free discreet delivery</b><small>Plain, private packaging across Chattogram</small></div></div>
       {cart.map(i => <CartItem key={i.key} i={i} qty={qty} />)}
       <div className="promo"><input placeholder="Have a promo code? (try SHIELD10)" value={promo} onChange={e => setPromo(e.target.value)} /><button onClick={applyPromo}>Apply</button></div>
@@ -981,18 +1166,22 @@ export default function App() {
 
   if (s === 'orders') { const stOf = o => liveSt[o.order_no] ?? (o.status || 0), list = orders.filter(o => oflt === 'all' || (oflt === 'active') === (stOf(o) < 3))
     body = <div className="scr narrow"><h2 className="ptl">My Orders</h2>
-      {orders.length > 0 && <div className="chips">{[['all', 'All'], ['active', 'Active'], ['done', 'Delivered']].map(([k, l]) => <button key={k} className={oflt === k ? 'on' : ''} onClick={() => setOflt(k)}>{l}</button>)}</div>}
-      {!orders.length ? <div className="emp"><div className="emp-i">📦</div><h3>No orders yet</h3><p>Your orders and their live status will show up here.</p><button className="btn" onClick={() => tab('home')}>Start shopping</button></div>
+      {orders.length > 0 && <div className="chips ochips">{[['all', 'All', orders.length], ['active', 'Active', orders.filter(o => stOf(o) < 3).length], ['done', 'Delivered', orders.filter(o => stOf(o) >= 3).length]].map(([k, l, c]) => <button key={k} className={oflt === k ? 'on' : ''} onClick={() => setOflt(k)}>{l}<span className="cnt">{c}</span></button>)}</div>}
+      {!orders.length ? <div className="emp"><div className="emp-i"><OrdersArt /></div><h3>No orders yet</h3><p>Your orders and their live status will show up here.</p><button className="btn" onClick={() => tab('home')}>Start shopping</button></div>
         : !list.length ? <p className="empty">No {oflt === 'active' ? 'active' : 'delivered'} orders.</p> : list.map(o => <OrderCard key={o.id} o={o} st={stOf(o)} open={x => go('tracking', { order: x })} />)}</div> }
 
-  if (s === 'tracking') { const o = orders.find(x => x.id === cur.order.id) || cur.order, st = liveSt[o.order_no] ?? (o.status || 0), t = new Date(o.created_at), its = o.items || [], ad = o.address || {}, sub = its.reduce((x, i) => x + i.price * i.qty, 0), dc = Math.max(0, sub - o.total)
-    body = <><Hdr title="Order Tracking" back={back} /><div className="scr narrow">
-      <div className="tkc"><div><small>Order</small><b>#{o.order_no}</b></div><div><small>Placed</small><b>{t.toLocaleDateString([], { dateStyle: 'medium' })}</b></div><div><small>Total</small><b>{taka(o.total)}</b></div></div>
-      <div className="tl">{STEPS.map((l, i) => <div key={l} className={'st' + (i <= st ? ' d' : '') + (i === st && st < 3 ? ' cur' : '')}><i>{i <= st && '✓'}</i><div><b>{l}</b><small>{i <= st ? t.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Expected soon'}</small></div></div>)}</div>
-      <div className="way"><span>{['📝', '📦', '🚚', '✅'][st]}</span><div><b>{['Order received!', 'We are preparing your order', 'Your order is on the way!', 'Delivered. Thank you!'][st]}</b><br />{['We will confirm it shortly.', 'It will be handed to our delivery partner soon.', 'Our delivery partner will reach you soon.', 'Hope you love it.'][st]}</div></div>
-      {its.length > 0 && <div className="cd2"><h5>Items</h5>{its.map((i, k) => <div className="ti" key={i.key || k}><Pic p={i} /><div><b>{i.name}</b><small>{i.variant && i.variant !== 'Standard' ? i.variant + ' · ' : ''}{taka(i.price)} × {i.qty}</small></div><b>{taka(i.price * i.qty)}</b></div>)}</div>}
-      {(ad.address || ad.name) && <div className="cd2 dl"><h5>Delivery to</h5><p><b>{ad.name}</b>{ad.phone && ' · ' + ad.phone}</p><p>{ad.address}</p>{ad.note && <small>Note: {ad.note}</small>}</div>}
-      <div className="sum"><div><span>Subtotal</span><span>{taka(sub)}</span></div>{dc > 0.5 && <div><span>Discount</span><span style={{ color: '#3ab36b' }}>−{taka(dc)}</span></div>}<div><span>Delivery</span><span style={{ color: '#3ab36b', fontWeight: 700 }}>Free</span></div>{o.payment && <div><span>Payment</span><span>{o.payment}{o.payment === 'bKash' ? (o.payment_status === 'paid' ? ' · Paid ✓' : o.payment_status === 'verifying' ? ' · Verifying…' : ' · Not paid yet') : ''}</span></div>}<div className="t"><span>Total</span><span>{taka(o.total)}</span></div></div>
+  if (s === 'tracking') { const o = orders.find(x => x.id === cur.order.id) || cur.order, st = liveSt[o.order_no] ?? (o.status || 0), t = new Date(o.created_at), its = o.items || [], ad = o.address || {}, sub = its.reduce((x, i) => x + i.price * i.qty, 0), dc = Math.max(0, sub - o.total), qn = its.reduce((x, i) => x + (i.qty || 1), 0)
+    const pst = o.payment === 'bKash' ? (o.payment_status === 'paid' ? ['Paid ✓', 'ok'] : o.payment_status === 'verifying' ? ['Verifying…', 'wait'] : ['Not paid yet', 'no']) : null
+    body = <><Hdr title="Order Tracking" back={back} /><div className="scr narrow trkscr">
+      <div className="tk-meta"><div><small>Order</small><b>#{o.order_no}</b></div><div><small>Placed</small><b>{t.toLocaleDateString([], { dateStyle: 'medium' })}</b><em>{t.toLocaleTimeString([], { timeStyle: 'short' })}</em></div><div><small>Total</small><b className="g">{taka(o.total)}</b></div></div>
+      <div className={'trk' + (st >= 3 ? ' fin' : '')}><div className="trk-top"><span className="trk-art"><StatusArt st={st} /></span><div className="trk-tx"><b>{['Order received!', 'We are preparing your order', 'Your order is on the way!', 'Delivered. Thank you!'][st]}</b><br />{['We will confirm it shortly.', 'It will be handed to our delivery partner soon.', 'Our delivery partner will reach you soon.', 'Hope you love it.'][st]}</div></div><div className="trk-rail"><div className="trk-line"><i className="trk-fill" style={{ width: (Math.min(st, 3) / 3 * 100) + '%' }} /></div>{STEPS.map((l, i) => <span key={l} className={'trk-n' + (i <= st ? ' on' : '') + (i === st && st < 3 ? ' cur' : '')} style={{ left: (i / 3 * 100) + '%' }} />)}</div><div className="trk-lb">{STEPS.map((l, i) => <small key={l} className={i <= st ? 'on' : ''}>{l}</small>)}</div></div>
+      {its.length > 0 && <section className="tk-card"><header><h5>Items</h5><span className="tk-pill">{qn} item{qn === 1 ? '' : 's'}</span></header>{its.map((i, k) => <div className="ti" key={i.key || k}><Pic p={i} /><div><b>{i.name}</b><small>{i.variant && i.variant !== 'Standard' ? i.variant + ' · ' : ''}{taka(i.price)} × {i.qty}</small></div><b>{taka(i.price * i.qty)}</b></div>)}</section>}
+      {((ad.address || ad.name) || o.payment) && <section className="tk-card"><header><h5>Delivery &amp; payment</h5></header>
+        {(ad.address || ad.name) && <div className="tk-row"><span className="tk-ic"><Icon n="pin" /></span><div><small>Delivering to</small><b>{ad.name}{ad.phone && ' · ' + ad.phone}</b>{ad.address && <p>{ad.address}</p>}{ad.note && <em>Note: {ad.note}</em>}</div></div>}
+        {o.payment && <div className="tk-row"><span className="tk-ic"><Icon n="card" /></span><div><small>Payment method</small><b>{o.payment}</b></div>{pst && <span className={'tk-chip ' + pst[1]}>{pst[0]}</span>}</div>}</section>}
+      <section className="tk-card tk-bill"><header><h5>Bill summary</h5></header>
+        <div className="r"><span>Subtotal</span><span>{taka(sub)}</span></div>{dc > 0.5 && <div className="r g"><span>Discount</span><span>−{taka(dc)}</span></div>}<div className="r g"><span>Delivery</span><span>Free</span></div>
+        <div className="tot"><span>Total</span><span>{taka(o.total)}</span></div></section>
       {its.length > 0 && <button className="btn o" style={{ marginTop: 14 }} onClick={() => reorder(o)}>Order again</button>}</div></> }
 
   if (s === 'profile') body = <Profile {...{ user, admin, count, tab, go, say }} wishCount={wish.length} place={loc.area || loc.city} hasAddr={!!(loc.area || loc.line)} onLogout={logout} />
