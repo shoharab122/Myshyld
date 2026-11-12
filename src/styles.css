@@ -391,13 +391,15 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .scr.hm{--hp-p:16px;--hp-t:16px;--hp-l:18px;--hp-r:18px}
 @media(max-width:899px){.scr.hm{--hp-t:calc(16px + env(safe-area-inset-top));--hp-l:max(18px,env(safe-area-inset-left));--hp-r:max(18px,env(safe-area-inset-right))}}
 @media(min-width:900px){.scr.hm{--hp-p:24px;--hp-t:24px;--hp-l:36px;--hp-r:36px}}
+/* the home scroller gives its top padding to the pinned row, so sticky has no offset to guess (fixes the gap above it) */
+.app .scr.hm{padding-top:0}
 /* full-bleed row that stays pinned; layout at rest is identical to before (10px padding + 4px margin = old 14px gap) */
 .hstick{position:sticky;top:calc(10px - var(--hp-p));z-index:12;isolation:isolate;
-  margin:calc(-1*var(--hp-t)) calc(-1*var(--hp-r)) 4px calc(-1*var(--hp-l));
+  margin:0 calc(-1*var(--hp-r)) 4px calc(-1*var(--hp-l));
   padding:var(--hp-t) var(--hp-r) 10px var(--hp-l)}
 .hstick .search{margin:14px 0 0}
 /* solid frosted panel: fades in while scrolling, so the page looks unchanged at the top and nothing shows through when pinned */
-.hstick::before{content:'';position:absolute;inset:0 0 -6px;z-index:-1;pointer-events:none;
+.hstick::before{content:'';position:absolute;inset:-2px 0 -6px;z-index:-1;pointer-events:none;
   background:#f7effbf2;border-bottom:1px solid #ffffffb3;border-radius:0 0 22px 22px;
   -webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);
   box-shadow:0 12px 22px -14px #4a166840}
