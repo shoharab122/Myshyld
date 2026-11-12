@@ -522,85 +522,82 @@ html.adm-on body{position:fixed;inset:0;width:100%}
   .mf{position:relative}
 }
 @media(min-width:900px){.mb:not(.np){padding:24px}.md{max-height:min(88dvh,820px)}}
-/* =========================================================
-   v3.2 — Orders, mobile optimisation
-   Scoped to the Orders page (.pg:has(>.ob)), the order sheet
-   (.md:has(.steps)) and the invoice (.invp). Desktop (≥900px)
-   is untouched. No JSX changes needed.
-   ========================================================= */
+/* ================= v3.2: Orders — mobile optimisation (phones only, <=899px) =================
+   Scoped to the Orders page + order sheet. Desktop and other tabs are untouched. */
 @media(max-width:899px){
-  .pg:has(>.ob){gap:12px;min-width:0}
-  .pg:has(>.ob) :is(button,a){touch-action:manipulation}
+  /* never let the Orders page or sheet scroll sideways */
+  .pg,.ol,.oc,.mc{min-width:0;max-width:100%}
+  .pg>*{min-width:0}
+  .mc{overflow-x:hidden}
 
-  /* status tiles: 2×2, icon beside label + count (readable, bigger tap area) */
-  .pg:has(>.ob) .ob{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .pg:has(>.ob) .ob button{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center;column-gap:10px;row-gap:0;padding:10px 12px;min-height:58px;border-radius:16px}
-  .pg:has(>.ob) .oi{grid-row:1/3;width:34px;height:34px;border-radius:11px}
-  .pg:has(>.ob) .ob small{align-self:end;margin:0;font-size:.74rem;line-height:1.15}
-  .pg:has(>.ob) .ob b{align-self:start;font-size:1.35rem;line-height:1.1}
+  /* status tiles: 2x2 so labels like "Out for delivery" are fully readable */
+  .ob{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .ob button{grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;align-items:center;justify-items:start;column-gap:10px;row-gap:0;padding:10px 12px;border-top-width:3px;min-height:56px}
+  .ob .oi{grid-row:1/3;width:34px;height:34px;border-radius:11px}
+  .ob small{font-size:.76rem;line-height:1.15;align-self:end;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .ob b{font-size:1.35rem;align-self:start}
 
-  /* toolbar: search / verify alert / date + export */
-  .pg:has(>.ob) .tl{display:flex;flex-wrap:wrap;gap:8px}
-  .pg:has(>.ob) .tl .sr{order:1;flex:1 1 100%}
-  .pg:has(>.ob) .tl .vchip{order:2;flex:1 1 100%;justify-content:center;min-height:44px}
-  .pg:has(>.ob) .tl .rg{order:3;flex:1 1 0;min-width:0}
-  .pg:has(>.ob) .tl .csvb{order:4;flex:none;min-height:48px;padding:0 16px}
-  .pg:has(>.ob) .sum{line-height:1.6}
-  .pg:has(>.ob) .lk{min-height:32px;display:inline-flex;align-items:center}
+  /* search / filters */
+  .tl{gap:8px}
+  .tl .sr{flex:1 1 100%}
+  .tl .rg{flex:1 1 0;min-width:0}
+  .tl .vchip{flex:1 1 auto;justify-content:center}
+  .tl .csvb{flex:1 1 0;min-height:48px}
+  .sum{line-height:1.5}
 
-  /* order cards */
-  .pg:has(>.ob) .ol{gap:10px}
-  .oc{border-radius:18px;border-left-width:4px}
-  .oc .ob-main{grid-template-columns:42px minmax(0,1fr) auto;gap:6px 10px;padding:12px 12px 10px}
-  .oc .ob-main:active{background:#ffffffb3}
-  .oc .av{width:42px;height:42px;font-size:.8rem}
-  .oc .g1 b{font-size:.95rem;line-height:1.25;overflow-wrap:anywhere}
-  .oc .rt b{font-size:1rem;white-space:nowrap}
-  .oc .its{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;line-height:1.35}
-  .oc .pm{gap:5px}
+  /* order card */
+  .ol{gap:12px}
+  .oc{border-radius:18px}
+  .ob-main{grid-template-columns:42px minmax(0,1fr) auto;gap:6px 10px;padding:12px;align-items:start}
+  .ob-main .av{width:42px;height:42px;font-size:.8rem}
+  .oc .g1{align-self:center}
+  .oc .g1 b{white-space:normal;overflow:visible;word-break:break-word;line-height:1.25;font-size:.95rem}
+  .oc .g1 small{white-space:normal;font-size:.78rem}
+  .rt{align-self:start;gap:5px}
+  .rt b{font-size:1rem}
+  .rt .pl{font-size:.7rem;padding:3px 9px}
+  .ob-main .its{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.35;font-size:.8rem;padding:7px 10px}
+  .ob-main .pm{gap:5px;font-size:.72rem}
 
-  /* card actions: address (2 lines max), then [call] [whatsapp] [next step] */
-  .oc .oa{flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:10px;padding:10px 12px 12px}
-  .oc .oa small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;flex:none;font-size:.78rem;line-height:1.35}
-  .oc .oa small svg{display:inline-block;vertical-align:-2px;margin-right:3px}
-  .oc .oq{display:flex;align-items:center;gap:8px;width:100%}
-  .oc .oq .ib3{width:46px;height:46px;border-radius:14px}
-  .oc .oq .bt{flex:1 1 0;min-width:0;min-height:46px;padding:0 10px;font-size:.88rem}
-  .oc .oq .ok{margin-left:auto;display:inline-flex;align-items:center;min-height:46px}
-  .pg:has(>.ob) .more{width:100%;justify-self:stretch}
+  /* card footer: address, then call · whatsapp · next-step on one row */
+  .oa{flex-direction:column;align-items:stretch;gap:10px;padding:10px 12px 12px}
+  .oa small{align-items:flex-start;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35;font-size:.78rem;word-break:break-word}
+  .oa small svg{flex:none;margin-top:2px}
+  .oa .oq{display:flex;gap:8px;align-items:center;justify-content:stretch;width:100%}
+  .oa .oq .ib3{width:46px;height:46px;border-radius:14px;flex:none}
+  .oa .oq .bt{flex:1 1 0;min-width:0;min-height:46px;font-size:.88rem;padding:0 12px}
+  .oa .oq .ok{flex:1;text-align:center;padding:10px 0}
+  .more{width:100%}
 
-  /* order sheet (bottom sheet) */
-  .md:has(.steps) .mc{gap:12px}
-  .md:has(.steps) .steps{gap:6px}
-  .md:has(.steps) .steps button{min-height:48px;padding:8px 4px;font-size:.74rem;overflow-wrap:anywhere}
-  .md:has(.steps) .cu{padding:10px 12px;gap:10px}
-  .md:has(.steps) .cu .pl{flex:none}
-  .md:has(.steps) .qa{gap:8px}
-  .md:has(.steps) .qa .bt{min-height:48px}
-  .md:has(.steps) .wc{min-height:40px;padding:0 14px}
-  .md:has(.steps) .bk-a .acts .bt{min-height:44px}
-  .md:has(.steps) .bk-a .acts .bt:first-child{flex:1 1 100%}
-  .md:has(.steps) .ln.it>b{white-space:nowrap}
-  .md:has(.steps) .ad .bt{width:100%}
-  .md:has(.steps) .mf{gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
-  .md:has(.steps) .mf .bt{flex:1 1 0;min-width:0;min-height:48px;padding:0 12px;white-space:normal;line-height:1.15}
-  .md:has(.steps) .mf .bt:first-child:not(:last-child){flex:1.6 1 0}
-
-  /* invoice */
-  .invp-bar{flex-wrap:wrap;padding-inline:10px;gap:8px}
-  .invp-bar>div{flex:1 1 auto;justify-content:flex-end}
-  .invp-bar>div .invp-b{flex:1;justify-content:center}
-  .invp-b{min-height:44px}
-  .invp-scroll{padding-inline:10px}
-  .invp .stp{right:14px;top:84px;font-size:.85rem}
-  .invp .ih img{width:88px}
-  .invp .it h2{font-size:1.35rem}
+  /* order detail sheet */
+  .mc>*{min-width:0}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .steps button{font-size:.82rem;min-height:46px;padding:8px 6px}
+  .cu{flex-wrap:wrap;gap:10px;padding:12px}
+  .cu .g1 b,.cu .g1 small{white-space:normal;word-break:break-word}
+  .cu .pl{margin-left:auto}
+  .qa .bt{min-height:48px}
+  .ad p,.bk-a p{word-break:break-word;overflow-wrap:anywhere}
+  .bk-a .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .bk-a .acts .bt{width:100%}
+  .bk-a .acts .bt.g{grid-column:1/-1}
+  .ln.it{gap:10px;align-items:flex-start}
+  .ln.it .th{width:44px;height:44px}
+  .ln.it>b{flex:none;font-size:.9rem;white-space:nowrap}
+  .ln.it .g1 small{white-space:normal}
+  .sm2>div{gap:12px}.sm2>div span:last-child{text-align:right}
+  .mf{gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
+  .mf .bt{min-width:0;font-size:.88rem;padding:0 12px}
 }
 
 /* small phones */
 @media(max-width:380px){
-  .pg:has(>.ob) .ob small{font-size:.7rem}
-  .md:has(.steps) .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .oc .oq .bt{font-size:.82rem;padding:0 8px}
-  .invp .im{grid-template-columns:1fr}
+  .ob button{padding:9px 10px}
+  .ob small{font-size:.72rem}
+  .ob-main{grid-template-columns:38px minmax(0,1fr) auto;gap:6px 8px;padding:10px}
+  .ob-main .av{width:38px;height:38px}
+  .oa .oq .ib3{width:42px;height:42px}
+  .oa .oq .bt{font-size:.82rem;padding:0 8px}
+  .steps button{font-size:.76rem}
+  .mf{flex-wrap:wrap}.mf .bt{flex:1 1 100%}
 }
