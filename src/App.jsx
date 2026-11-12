@@ -10,7 +10,7 @@ const OB = [
   { e: '📦', t: ['Discreet Delivery', 'Across Chattogram'], d: 'Plain packaging. No product name. No judgment.' },
 ]
 const STEPS = ['Order Placed', 'Processing', 'Out for Delivery', 'Delivered']
-const PAYS = [['Cash on Delivery', 'Pay when you receive', '💵'], ['bKash', 'Pay with bKash', '🌸'], ['Nagad', 'Pay with Nagad', '🟠'], ['Debit/Credit Card', 'Visa, Mastercard', '💳']]
+const PAYS = [['Cash on Delivery', 'Pay when you receive', '💵'], ['bKash', 'Send money, then enter your TrxID', '🌸'], ['Nagad', 'Pay with Nagad', '🟠'], ['Debit/Credit Card', 'Visa, Mastercard', '💳']]
 const OFFERS = [['Limited Offer', 'Privacy. Confidence.|Comfort. Wellness.', '🛡️'], ['Free Delivery', 'Discreet delivery|across Chattogram', '🚚'], ['Use code SHIELD10', 'Get 10% off|your first order', '🎁']]
 const SORTS = { pop: ['Popular', (a, b) => b.reviews - a.reviews], lo: ['Price: Low → High', (a, b) => a.price - b.price], hi: ['Price: High → Low', (a, b) => b.price - a.price], rate: ['Top rated', (a, b) => b.rating - a.rating] }
 const RIPPLE = '.bshop,.cc,.btn,.fab,.add,.cat,.card,.pay,.menu,.ib,.tabs button,.chips button,.var button,.heart,.qty button,.promo button,.social'
@@ -407,6 +407,35 @@ const Icon = ({ n }) => <svg className="ico" width="20" height="20" viewBox="0 0
 const GoogleG = () => <svg className="ico" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z" /><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z" /><path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z" /><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z" /></svg>
 const AppleMark = () => <svg className="ico" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" /></svg>
 const Steps = ({ n }) => <div className="stp">{['Cart', 'Details', 'Payment'].map((l, i) => <div key={l} className={i <= n ? 'on' : ''}><i>{i < n ? '✓' : i + 1}</i><span>{l}</span></div>)}</div>
+const copyText = async (t, say, msg) => {
+  try { await navigator.clipboard.writeText(t) }
+  catch { try { const a = document.createElement('textarea'); a.value = t; a.style.position = 'fixed'; a.style.opacity = '0'; document.body.appendChild(a); a.select(); document.execCommand('copy'); a.remove() } catch { return say('Could not copy. Please copy it by hand.') } }
+  say(msg)
+}
+const BkashPay = ({ total, cart, promo, addr, back, say, onDone }) => {
+  const [trx, setTrx] = useState(''), [from, setFrom] = useState(addr.phone || ''), [busy, setBusy] = useState(false)
+  const amt = Number(total), amtTxt = Number.isInteger(amt) ? String(amt) : amt.toFixed(2), app = api.bkashAppLink()
+  const submit = async () => {
+    const t = trx.replace(/\s/g, '').toUpperCase()
+    if (!/^[A-Z0-9]{8,12}$/.test(t)) return say('Enter the Transaction ID from your bKash SMS (8 to 12 letters/numbers)', 3200)
+    if (!/^(?:\+?88)?01[3-9]\d{8}$/.test(from.replace(/[\s-]/g, ''))) return say('Enter the bKash number you paid from (01XXXXXXXXX)', 3200)
+    setBusy(true)
+    try { onDone(await api.placeBkashOrder({ items: cart, promo, address: addr, amount: amt, trx: t, sender: from })) }
+    catch (e) { say(e?.message || 'Could not submit. Please try again.', 3500); setBusy(false) }
+  }
+  return <><Hdr title="Pay with bKash" back={back} /><div className="scr narrow bk">
+    <div className="bk-hero"><small>Amount to send</small><b>৳{amtTxt}</b><span>Your order is placed after you submit the TrxID</span>
+      <button className="bk-mini" onClick={() => copyText(amtTxt, say, 'Amount copied')}>Copy amount</button></div>
+    <div className="bk-card"><PayLogo k={1} /><div className="bk-num"><small>bKash number · {api.BKASH.mode}</small><b>{api.BKASH.number}</b></div>
+      <button className="bk-copy" onClick={() => copyText(api.BKASH.number, say, 'Number copied')}>Copy</button></div>
+    {app && <a className="bk-app" href={app}>Open bKash app</a>}
+    <ol className="bk-steps"><li>Open the bKash app and choose <b>{api.BKASH.mode}</b>.</li><li>Send exactly <b>৳{amtTxt}</b> to <b>{api.BKASH.number}</b>.</li><li>Copy the <b>Transaction ID (TrxID)</b> from the confirmation SMS and enter it below.</li></ol>
+    <label className="lbl">Transaction ID (TrxID)<input className="inp bk-trx" placeholder="e.g. 9G7A5B3C2D" value={trx} onChange={e => setTrx(e.target.value.toUpperCase())} autoCapitalize="characters" autoComplete="off" spellCheck="false" maxLength={14} /></label>
+    <label className="lbl">bKash number you paid from<input className="inp" type="tel" inputMode="tel" placeholder="01XXXXXXXXX" value={from} onChange={e => setFrom(e.target.value)} autoComplete="tel" /></label>
+    <div className="note">🔒 We confirm your payment before your order is prepared. This usually takes a few minutes.</div>
+    <button className="btn" disabled={busy} onClick={submit}>{busy ? <i className="spin" /> : 'Submit payment'}</button>
+  </div></>
+}
 const Hdr = ({ title, back, right }) => <div className="hdr"><button className="ib" aria-label="Back" onClick={back}><Icon n="back" /></button><span className="ht">{title}</span>{right || <span className="ib ghost" />}</div>
 const Heart = ({ on, toggle, inl }) => <button className={'heart' + (on ? ' on' : '') + (inl ? ' inl' : '')} aria-label="Wishlist" aria-pressed={on} onClick={e => { e.stopPropagation(); toggle() }}>{on ? '♥' : '♡'}</button>
 
@@ -823,10 +852,14 @@ export default function App() {
   const applyPromo = () => promo.trim().toUpperCase() === 'SHIELD10' ? (setPromoOn(true), say('10% off applied')) : say('Invalid promo code')
   const place = async () => {
     if (busy) return
-    if (pay === 1 || pay === 2) { // bKash / Nagad: order is created + priced on the server, then we hand off to the gateway
+    if (pay === 1) { // manual bKash: no order yet. It is created only when the customer submits the TrxID, so leaving keeps the cart
+      if (!realUid(user) || !api.supabase) return say('Please sign in with your email to pay with bKash')
+      return go('bkash')
+    }
+    if (pay === 2) { // Nagad: order is created + priced on the server, then we hand off to the gateway
       if (!realUid(user) || !api.supabase) return say('Please sign in with your email to pay with ' + PAYS[pay][0])
       setBusy(true)
-      try { location.assign(await api.startOnlinePayment({ provider: pay === 1 ? 'bkash' : 'nagad', items: cart, promo: promoOn ? 'SHIELD10' : '', address: addr })) }
+      try { location.assign(await api.startOnlinePayment({ provider: 'nagad', items: cart, promo: promoOn ? 'SHIELD10' : '', address: addr })) }
       catch (e) { say(e?.message || 'Could not start payment. Please try again.'); setBusy(false) }
       return
     }
@@ -899,8 +932,10 @@ export default function App() {
     </div></div>
 
   if (s === 'home') body = <div className="scr hm">
-    <div className="topbar"><LocChip loc={loc} onClick={() => go('address')} /><button className="ib" aria-label="Open cart" onClick={() => tab('cart')}><Icon n="bag" />{count > 0 && <em className="cb" key={count}>{count}</em>}</button></div>
-    <div className="search"><Icon n="search" /><input placeholder="What are you looking for?" value={q} onChange={e => setQ(e.target.value)} /><button className="sf" aria-label="Filters" onClick={() => tab('categories')}><Icon n="sliders" /></button></div>
+    <div className="hstick">
+      <div className="topbar"><LocChip loc={loc} onClick={() => go('address')} /><button className="ib" aria-label="Open cart" onClick={() => tab('cart')}><Icon n="bag" />{count > 0 && <em className="cb" key={count}>{count}</em>}</button></div>
+      <div className="search"><Icon n="search" /><input placeholder="What are you looking for?" value={q} onChange={e => setQ(e.target.value)} /><button className="sf" aria-label="Filters" onClick={() => tab('categories')}><Icon n="sliders" /></button></div>
+    </div>
     <Banner shop={tab} />
     <div className="sec">Categories <a onClick={() => tab('categories')}>See all</a></div>
     <div className="catrow">{cats.map((c, i) => <button key={c.id} style={{ '--i': i }} className="cc rise" onClick={() => go('category', { c })}><b>{c.name}</b><span><Glyph v={c.icon} /></span></button>)}</div>
@@ -933,10 +968,15 @@ export default function App() {
   if (s === 'payment') body = <><Hdr title="Payment Method" back={back} /><div className="scr narrow"><Steps n={2} /><div className="mini"><span>{count} item{count === 1 ? '' : 's'} · Free delivery</span><b><Money v={total} /></b></div>
     {PAYS.map(([n, d], k) => <button key={n} className={'pay' + (pay === k ? ' on' : '')} onClick={() => setPay(k)}><PayLogo k={k} /><div><b>{n}</b><small>{d}</small></div><i /></button>)}
     <div className="note" style={{ background: '#eaf8efcc', color: '#2a8a52' }}>🛡️ SSL Secured Payment — your information is always protected.</div>
-    <button className="btn" disabled={busy} onClick={place}>{busy ? <i className="spin" /> : <>{pay === 1 || pay === 2 ? 'Pay Now' : 'Place Order'} · <Money v={total} /></>}</button></div></>
+    <button className="btn" disabled={busy} onClick={place}>{busy ? <i className="spin" /> : <>{pay === 1 ? 'Continue to bKash' : pay === 2 ? 'Pay Now' : 'Place Order'} · <Money v={total} /></>}</button></div></>
+
+  if (s === 'bkash') body = <BkashPay total={total} cart={cart} promo={promoOn ? 'SHIELD10' : ''} addr={addr} back={back} say={say} onDone={o => {
+    setCart([]); setPromoOn(false); say('Payment submitted. We are verifying it.', 3000)
+    collapse(() => { depth.current = 1; try { history.pushState({ ms: 1 }, '') } catch { /* history blocked */ } setDir('fwd'); setStack([{ s: 'home' }, { s: 'done', order: o }]) })
+  }} />
 
   if (s === 'done') body = <div className="scr ok narrow"><div className="tick">✓</div><h2 style={{ margin: '24px 0 4px' }}>Order Placed Successfully!</h2><div className="pill">Order #{cur.order.order_no}</div>
-    <p style={{ color: '#8b8197', marginBottom: 30 }}>Thank you for choosing MyShield.<br />Your order will be delivered soon.</p>
+    <p style={{ color: '#8b8197', marginBottom: 30 }}>Thank you for choosing MyShield.<br />{cur.order.payment_status === 'verifying' ? 'We are verifying your bKash payment. We will confirm your order shortly.' : 'Your order will be delivered soon.'}</p>
     <button className="btn" onClick={() => go('tracking', { order: cur.order })}>Track Order</button><button className="btn o" style={{ marginTop: 12 }} onClick={() => tab('home')}>Continue Shopping</button></div>
 
   if (s === 'orders') { const stOf = o => liveSt[o.order_no] ?? (o.status || 0), list = orders.filter(o => oflt === 'all' || (oflt === 'active') === (stOf(o) < 3))
@@ -952,7 +992,7 @@ export default function App() {
       <div className="way"><span>{['📝', '📦', '🚚', '✅'][st]}</span><div><b>{['Order received!', 'We are preparing your order', 'Your order is on the way!', 'Delivered. Thank you!'][st]}</b><br />{['We will confirm it shortly.', 'It will be handed to our delivery partner soon.', 'Our delivery partner will reach you soon.', 'Hope you love it.'][st]}</div></div>
       {its.length > 0 && <div className="cd2"><h5>Items</h5>{its.map((i, k) => <div className="ti" key={i.key || k}><Pic p={i} /><div><b>{i.name}</b><small>{i.variant && i.variant !== 'Standard' ? i.variant + ' · ' : ''}{taka(i.price)} × {i.qty}</small></div><b>{taka(i.price * i.qty)}</b></div>)}</div>}
       {(ad.address || ad.name) && <div className="cd2 dl"><h5>Delivery to</h5><p><b>{ad.name}</b>{ad.phone && ' · ' + ad.phone}</p><p>{ad.address}</p>{ad.note && <small>Note: {ad.note}</small>}</div>}
-      <div className="sum"><div><span>Subtotal</span><span>{taka(sub)}</span></div>{dc > 0.5 && <div><span>Discount</span><span style={{ color: '#3ab36b' }}>−{taka(dc)}</span></div>}<div><span>Delivery</span><span style={{ color: '#3ab36b', fontWeight: 700 }}>Free</span></div>{o.payment && <div><span>Payment</span><span>{o.payment}</span></div>}<div className="t"><span>Total</span><span>{taka(o.total)}</span></div></div>
+      <div className="sum"><div><span>Subtotal</span><span>{taka(sub)}</span></div>{dc > 0.5 && <div><span>Discount</span><span style={{ color: '#3ab36b' }}>−{taka(dc)}</span></div>}<div><span>Delivery</span><span style={{ color: '#3ab36b', fontWeight: 700 }}>Free</span></div>{o.payment && <div><span>Payment</span><span>{o.payment}{o.payment === 'bKash' ? (o.payment_status === 'paid' ? ' · Paid ✓' : o.payment_status === 'verifying' ? ' · Verifying…' : ' · Not paid yet') : ''}</span></div>}<div className="t"><span>Total</span><span>{taka(o.total)}</span></div></div>
       {its.length > 0 && <button className="btn o" style={{ marginTop: 14 }} onClick={() => reorder(o)}>Order again</button>}</div></> }
 
   if (s === 'profile') body = <Profile {...{ user, admin, count, tab, go, say }} wishCount={wish.length} place={loc.area || loc.city} hasAddr={!!(loc.area || loc.line)} onLogout={logout} />
