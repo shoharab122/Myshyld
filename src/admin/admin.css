@@ -522,3 +522,85 @@ html.adm-on body{position:fixed;inset:0;width:100%}
   .mf{position:relative}
 }
 @media(min-width:900px){.mb:not(.np){padding:24px}.md{max-height:min(88dvh,820px)}}
+/* =========================================================
+   v3.2 — Orders, mobile optimisation
+   Scoped to the Orders page (.pg:has(>.ob)), the order sheet
+   (.md:has(.steps)) and the invoice (.invp). Desktop (≥900px)
+   is untouched. No JSX changes needed.
+   ========================================================= */
+@media(max-width:899px){
+  .pg:has(>.ob){gap:12px;min-width:0}
+  .pg:has(>.ob) :is(button,a){touch-action:manipulation}
+
+  /* status tiles: 2×2, icon beside label + count (readable, bigger tap area) */
+  .pg:has(>.ob) .ob{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .pg:has(>.ob) .ob button{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center;column-gap:10px;row-gap:0;padding:10px 12px;min-height:58px;border-radius:16px}
+  .pg:has(>.ob) .oi{grid-row:1/3;width:34px;height:34px;border-radius:11px}
+  .pg:has(>.ob) .ob small{align-self:end;margin:0;font-size:.74rem;line-height:1.15}
+  .pg:has(>.ob) .ob b{align-self:start;font-size:1.35rem;line-height:1.1}
+
+  /* toolbar: search / verify alert / date + export */
+  .pg:has(>.ob) .tl{display:flex;flex-wrap:wrap;gap:8px}
+  .pg:has(>.ob) .tl .sr{order:1;flex:1 1 100%}
+  .pg:has(>.ob) .tl .vchip{order:2;flex:1 1 100%;justify-content:center;min-height:44px}
+  .pg:has(>.ob) .tl .rg{order:3;flex:1 1 0;min-width:0}
+  .pg:has(>.ob) .tl .csvb{order:4;flex:none;min-height:48px;padding:0 16px}
+  .pg:has(>.ob) .sum{line-height:1.6}
+  .pg:has(>.ob) .lk{min-height:32px;display:inline-flex;align-items:center}
+
+  /* order cards */
+  .pg:has(>.ob) .ol{gap:10px}
+  .oc{border-radius:18px;border-left-width:4px}
+  .oc .ob-main{grid-template-columns:42px minmax(0,1fr) auto;gap:6px 10px;padding:12px 12px 10px}
+  .oc .ob-main:active{background:#ffffffb3}
+  .oc .av{width:42px;height:42px;font-size:.8rem}
+  .oc .g1 b{font-size:.95rem;line-height:1.25;overflow-wrap:anywhere}
+  .oc .rt b{font-size:1rem;white-space:nowrap}
+  .oc .its{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;line-height:1.35}
+  .oc .pm{gap:5px}
+
+  /* card actions: address (2 lines max), then [call] [whatsapp] [next step] */
+  .oc .oa{flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:10px;padding:10px 12px 12px}
+  .oc .oa small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;flex:none;font-size:.78rem;line-height:1.35}
+  .oc .oa small svg{display:inline-block;vertical-align:-2px;margin-right:3px}
+  .oc .oq{display:flex;align-items:center;gap:8px;width:100%}
+  .oc .oq .ib3{width:46px;height:46px;border-radius:14px}
+  .oc .oq .bt{flex:1 1 0;min-width:0;min-height:46px;padding:0 10px;font-size:.88rem}
+  .oc .oq .ok{margin-left:auto;display:inline-flex;align-items:center;min-height:46px}
+  .pg:has(>.ob) .more{width:100%;justify-self:stretch}
+
+  /* order sheet (bottom sheet) */
+  .md:has(.steps) .mc{gap:12px}
+  .md:has(.steps) .steps{gap:6px}
+  .md:has(.steps) .steps button{min-height:48px;padding:8px 4px;font-size:.74rem;overflow-wrap:anywhere}
+  .md:has(.steps) .cu{padding:10px 12px;gap:10px}
+  .md:has(.steps) .cu .pl{flex:none}
+  .md:has(.steps) .qa{gap:8px}
+  .md:has(.steps) .qa .bt{min-height:48px}
+  .md:has(.steps) .wc{min-height:40px;padding:0 14px}
+  .md:has(.steps) .bk-a .acts .bt{min-height:44px}
+  .md:has(.steps) .bk-a .acts .bt:first-child{flex:1 1 100%}
+  .md:has(.steps) .ln.it>b{white-space:nowrap}
+  .md:has(.steps) .ad .bt{width:100%}
+  .md:has(.steps) .mf{gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
+  .md:has(.steps) .mf .bt{flex:1 1 0;min-width:0;min-height:48px;padding:0 12px;white-space:normal;line-height:1.15}
+  .md:has(.steps) .mf .bt:first-child:not(:last-child){flex:1.6 1 0}
+
+  /* invoice */
+  .invp-bar{flex-wrap:wrap;padding-inline:10px;gap:8px}
+  .invp-bar>div{flex:1 1 auto;justify-content:flex-end}
+  .invp-bar>div .invp-b{flex:1;justify-content:center}
+  .invp-b{min-height:44px}
+  .invp-scroll{padding-inline:10px}
+  .invp .stp{right:14px;top:84px;font-size:.85rem}
+  .invp .ih img{width:88px}
+  .invp .it h2{font-size:1.35rem}
+}
+
+/* small phones */
+@media(max-width:380px){
+  .pg:has(>.ob) .ob small{font-size:.7rem}
+  .md:has(.steps) .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .oc .oq .bt{font-size:.82rem;padding:0 8px}
+  .invp .im{grid-template-columns:1fr}
+}
