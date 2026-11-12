@@ -907,10 +907,10 @@ export default function App() {
 
   if (s === 'auth') body = <div className="auth">
     <div className="blobs" aria-hidden="true"><i /><i /><i /></div>
+    <header className="abar"><span className="am"><img src="/logo-mark.webp?v=2" width="34" height="34" alt="" decoding="async" draggable="false" /></span><div className="an"><h1>MyShield</h1><small>Privacy. Confidence. Comfort. Wellness.</small></div><span className="ap"><Icon n="lock" />Private</span></header>
     <div className="auth-in">
-      <h1 className="lgcard"><img src="/logo-full.webp?v=2" width="220" height="197" alt="MyShield" decoding="async" /></h1>
-      <p className="tag">Privacy. Confidence. Comfort. Wellness.</p>
       <form className={'auth-card glass' + (shake ? ' shake' : '')} onSubmit={login} noValidate>
+        {(mode === 'login' || mode === 'signup') && <div className="ah"><h2>{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2><p>{mode === 'login' ? 'Log in to continue shopping privately.' : 'Join MyShield for discreet delivery across Chattogram.'}</p></div>}
         {(mode === 'login' || mode === 'signup') && <div className="tabs" data-i={mode === 'login' ? 0 : 1}>{['login', 'signup'].map(m => <button type="button" key={m} className={mode === m ? 'on' : ''} onClick={() => setMode(m)}>{m === 'login' ? 'Login' : 'Sign Up'}</button>)}</div>}
         {mode === 'forgot' && <p className="msg"><b>Reset your password</b><br />Enter your account email and we will send you a reset link.</p>}
         {mode === 'reset' && <p className="msg"><b>Set a new password</b><br />Choose a new password for your account.</p>}
