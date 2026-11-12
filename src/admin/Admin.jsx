@@ -137,10 +137,10 @@ const WA = [
 ]
 const defTpl = o => { const s = o.status || 0; return o.payment === 'bKash' && o.payment_status !== 'paid' && s === 0 ? 1 : [0, 0, 2, 3][s] }
 const payLabel = o => o.payment_status === 'paid' ? 'Paid' : o.payment_status === 'verifying' ? 'Verifying' : 'Unpaid'
-const invText = o => `🧾 MyShyld invoice #${o.order_no}\n${fmt(o.created_at)}\n\n` + (o.items || []).map(i => `• ${i.name}${i.variant ? ' (' + i.variant + ')' : ''} ×${i.qty} — ${taka(i.price * i.qty)}`).join('\n') + `\n\nTotal: ${taka(o.total)}\nPayment: ${o.payment || '—'} (${payLabel(o)})\nThank you! 💗`
+const invText = o => `🧾 MyShyld invoice #${o.order_no}\n${fmt(o.created_at)}\n\n` + (o.items || []).map(i => `• ${i.name}${i.variant ? ' (' + i.variant + ')' : ''} ×${i.qty} — ${taka(i.price * i.qty)}`).join('\n') + `${o.delivery_fee != null ? `\nDelivery: ${taka(o.delivery_fee)}` : ''}\n\nTotal: ${taka(o.total)}\nPayment: ${o.payment || '—'} (${payLabel(o)})\nThank you! 💗`
 
 function Invoice({ o, onClose }) {
-  const its = o.items || [], sub = its.reduce((a, i) => a + i.price * i.qty, 0), disc = Math.max(0, sub - o.total), paid = o.payment_status === 'paid', trx = o.payment_ref || o.bkash_trx
+  const its = o.items || [], sub = its.reduce((a, i) => a + i.price * i.qty, 0), fee = o.delivery_fee == null ? null : +o.delivery_fee, disc = Math.max(0, sub + (fee || 0) - o.total), paid = o.payment_status === 'paid', trx = o.payment_ref || o.bkash_trx
   useEffect(() => {
     document.body.classList.add('inv-on')
     const h = e => e.key === 'Escape' && onClose(); addEventListener('keydown', h)
@@ -154,7 +154,7 @@ function Invoice({ o, onClose }) {
       <div className="im"><div><span>Date</span><b>{fmt(o.created_at)}</b></div><div><span>Order status</span><b>{STEPS[o.status || 0]}</b></div><div><span>Payment method</span><b>{o.payment || '—'}</b></div><div><span>Payment status</span><b className={'bg ' + (paid ? 'ok' : o.payment_status === 'verifying' ? 'w' : '')}>{payLabel(o)}</b></div>{trx && o.payment === 'bKash' && <div><span>bKash TrxID</span><b>{trx}</b></div>}</div>
       <div className="bd"><span className="bl">Bill to</span><p><b>{o.address?.name || 'Customer'}</b></p>{o.address?.phone && <p>{o.address.phone}</p>}<p>{o.address?.address || '—'}</p>{o.address?.note && <p className="nt2">Note: {o.address.note}</p>}</div>
       <table><thead><tr><th>Item</th><th className="r">Qty</th><th className="r">Amount</th></tr></thead><tbody>{its.map((i, ix) => <tr key={i.key || ix}><td>{i.name}<small>{i.variant ? i.variant + ' · ' : ''}{taka(i.price)} each</small></td><td className="r">{i.qty}</td><td className="r">{taka(i.price * i.qty)}</td></tr>)}</tbody></table>
-      <div className="tot"><div><span>Subtotal</span><span>{taka(sub)}</span></div>{disc > 0.5 && <div><span>Discount</span><span>−{taka(disc)}</span></div>}<div className="g"><span>Total</span><span>{taka(o.total)}</span></div></div>
+      <div className="tot"><div><span>Subtotal</span><span>{taka(sub)}</span></div>{disc > 0.5 && <div><span>Discount</span><span>−{taka(disc)}</span></div>}{fee != null && <div><span>Delivery</span><span>{taka(fee)}</span></div>}<div className="g"><span>Total</span><span>{taka(o.total)}</span></div></div>
       <footer className="ft">Thank you for shopping with MyShyld 💗<br />Your order is packed discreetly.</footer>
     </article></div></div>, document.body)
 }
@@ -383,7 +383,7 @@ function Orders({ d: { orders }, reload, say, focus, clearFocus }) {
       <div className="cd ad"><p>{cur.address?.address || '—'}</p>{cur.address?.note && <p className="mut">Note: {cur.address.note}</p>}<button className="bt g sm" onClick={() => copy(cur.address?.address, 'Address')}><Ic n="copy" s={15} />Copy address</button></div>
       <h3>Items</h3>
       {(cur.items || []).map((i, ix) => <div className="ln it" key={i.key || ix}><span className="th">{i.image_url ? <img src={i.image_url} alt="" loading="lazy" decoding="async" /> : i.emoji || '🛍️'}</span><span className="g1"><b>{i.name}</b><small>{i.variant ? i.variant + ' · ' : ''}{taka(i.price)} × {i.qty}</small></span><b>{taka(i.price * i.qty)}</b></div>)}
-      <div className="sm2"><div><span>Subtotal</span><span>{taka(sub)}</span></div>{sub - cur.total > 0.5 && <div><span>Discount</span><span className="ok">−{taka(sub - cur.total)}</span></div>}<div><span>Payment</span><span>{cur.payment} · {payLabel(cur)}</span></div><div className="tt"><span>Total</span><span>{taka(cur.total)}</span></div></div>
+      <div className="sm2"><div><span>Subtotal</span><span>{taka(sub)}</span></div>{sub + (+cur.delivery_fee || 0) - cur.total > 0.5 && <div><span>Discount</span><span className="ok">−{taka(sub + (+cur.delivery_fee || 0) - cur.total)}</span></div>}{cur.delivery_fee != null && <div><span>Delivery{cur.delivery_km != null && ` · ${(+cur.delivery_km).toFixed(1)} km`}</span><span>{taka(cur.delivery_fee)}</span></div>}<div><span>Payment</span><span>{cur.payment} · {payLabel(cur)}</span></div><div className="tt"><span>Total</span><span>{taka(cur.total)}</span></div></div>
       <p className="mut">Placed {fmt(cur.created_at)} · {ago(cur.created_at)}</p>
     </Modal>}
     {cur && inv && <Invoice o={cur} onClose={closeInv} />}</div>
@@ -494,7 +494,7 @@ function Cats({ d, reload, say }) {
     <div className="cd lst">{d.cats.map(c => <div className="rw" key={c.id}>{e?.id === c.id ? <><input className="in ic" aria-label="Icon" value={e.icon} onChange={x => setE({ ...e, icon: x.target.value })} /><input className="in g1" aria-label="Name" value={e.name} onChange={x => setE({ ...e, name: x.target.value })} /><button className="bt sm" onClick={async () => { if (!e.name.trim()) return say('Enter a category name'); if (await run(sb.from('categories').update({ name: e.name.trim(), icon: e.icon || '🛍️' }).eq('id', c.id), 'Category saved')) setE(null) }}>Save</button><button className="bt g sm" onClick={() => setE(null)}>Cancel</button></> : <><span className="th">{c.icon}</span><span className="g1"><b>{c.name}</b><small>{cnt[c.id] || 0} products</small></span><button className="bt g sm" onClick={() => setE({ ...c })}>Edit</button><button className="bt d sm" aria-label={'Delete ' + c.name} onClick={() => del(c)}>Delete</button></>}</div>)}{!d.cats.length && <p className="mut pad">No categories yet.</p>}</div></div>
 }
 
-const DEF = [{ chip: 'Limited Offer', lines: 'Privacy. Confidence.\nComfort. Wellness.', emoji: '🛡️', image: '', on: true }, { chip: 'Free Delivery', lines: 'Discreet delivery\nacross Chattogram', emoji: '🚚', image: '', on: true }, { chip: 'Use code SHIELD10', lines: 'Get 10% off\nyour first order', emoji: '🎁', image: '', on: true }]
+const DEF = [{ chip: 'Limited Offer', lines: 'Privacy. Confidence.\nComfort. Wellness.', emoji: '🛡️', image: '', on: true }, { chip: 'Delivery from ৳40', lines: 'Discreet delivery\nacross Chattogram', emoji: '🚚', image: '', on: true }, { chip: 'Use code SHIELD10', lines: 'Get 10% off\nyour first order', emoji: '🎁', image: '', on: true }]
 const isLogo = v => v === '🛡️' || v === '🛡'
 function Hero({ say }) {
   const [s, setS] = useState(null), [busy, setBusy] = useState(false), [dirty, setDirty] = useState(false)
