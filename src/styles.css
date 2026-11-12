@@ -417,3 +417,56 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   .hstick .search{min-height:50px;margin-top:10px}
   .hstick .search input{padding:13px 4px}
 }
+
+/* =========================================================
+   LOGIN v3: bright card on the MyShield purple, brand logo on top
+   ========================================================= */
+.auth{background:radial-gradient(120% 60% at 50% -8%,#8e2a8c 0,#4a1668 48%,#2d0b4a 100%)}
+.auth .blobs::after{content:'';position:absolute;inset:0;background-image:radial-gradient(#ffffff2e 1.2px,#0000 1.6px);background-size:24px 24px;-webkit-mask-image:linear-gradient(#000,#0000 55%);mask-image:linear-gradient(#000,#0000 55%)}
+.auth .blobs i{opacity:.55}
+.auth-in{max-width:420px}
+.auth .lgcard{background:#fff;width:clamp(96px,28vw,118px);padding:10px 12px;margin:0 auto 10px;border-radius:26px;box-shadow:0 18px 38px -10px #1a063a99,0 0 0 6px #ffffff24,inset 0 -3px 8px #8e2a8c14}
+.auth .tag{color:#ffffffd9;font-size:12px;letter-spacing:.09em;margin:0 0 16px}
+.auth .auth-card{background:#fff;border:1px solid #ffffffcc;color:var(--ink);padding:20px 18px 18px;border-radius:28px;gap:12px;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 30px 60px -18px #1a063aaa,0 2px 0 #ffffff inset}
+.auth .ah{text-align:left;padding:0 2px 2px}
+.auth .ah h2{margin:0;font-size:23px;line-height:1.2;font-weight:800;color:var(--p1);letter-spacing:-.2px}
+.auth .ah p{margin:4px 0 0;font-size:13.5px;line-height:1.45;color:var(--mute)}
+.auth .auth-card .tabs{background:#f5eef9;border:1px solid #eadff4;box-shadow:none;height:48px}
+.auth .auth-card .tabs::before{background:linear-gradient(120deg,#6b1b77,#e0457b);box-shadow:0 8px 16px -6px #8e2a8c99}
+.auth .auth-card .tabs button{color:var(--mute);font-weight:700}
+.auth .auth-card .tabs .on{color:#fff}
+.auth .auth-card .fld{background:#f8f4fb;border:1.5px solid #eee5f6;box-shadow:none;min-height:56px;border-radius:16px}
+.auth .auth-card .fld:focus-within{background:#fff;border-color:var(--p2);box-shadow:0 0 0 4px #8e2a8c1f}
+.auth .auth-card .fld .fi{background:linear-gradient(145deg,#f1e4fa,#fde7f0);color:var(--p2);box-shadow:none}
+.auth .auth-card .fld:focus-within .fi{background:linear-gradient(145deg,#8e2a8c,#e0457b);color:#fff}
+.auth .auth-card .fld input{color:var(--ink);font-weight:500}
+.auth .auth-card .fld input::placeholder{color:#a79bb5;font-weight:400}
+.auth .auth-card .fld input:-webkit-autofill{-webkit-text-fill-color:var(--ink);box-shadow:0 0 0 60px #f8f4fb inset}
+.auth .auth-card .fld .eye{color:var(--mute);opacity:1}
+.auth .auth-card .fld .eye:hover{color:var(--p2)}
+.auth .auth-card .forgot button{color:var(--p2);font-weight:700;font-size:13px;padding:4px 2px}
+.auth .auth-card .msg{color:var(--mute)}.auth .auth-card .msg b{color:var(--p1);font-size:18px}
+.auth .auth-card .btn:not(.o){background:linear-gradient(120deg,#6b1b77,#8e2a8c 48%,#e0457b);background-size:200% 100%;box-shadow:0 16px 28px -10px #8e2a8cbb,inset 0 1.5px 0 #ffffff66,inset 0 -8px 14px #2d0b4a40;text-shadow:0 1px 2px #2d0b4a55}
+.auth .auth-card .btn.o{background:#fff;color:var(--ink);border:1.5px solid #e6dcf0;box-shadow:0 6px 16px -8px #4a166833;text-shadow:none;font-weight:700}
+.auth .auth-card .btn.o:active{background:#f8f4fb}
+.auth .auth-card .or{color:var(--mute);margin:2px 0}
+.auth .auth-card .or::before,.auth .auth-card .or::after{background:#eadff4}
+.auth .sw{color:#ffffffe0}.auth .trust{color:#ffffffb3}
+@media(max-height:700px){.auth .lgcard{width:84px;padding:8px 10px;margin-bottom:6px;border-radius:22px}.auth .tag{margin-bottom:10px;font-size:11px}.auth .ah h2{font-size:20px}.auth .ah p{display:none}}
+@media(max-width:380px){.auth .auth-card{padding:16px 14px}.auth .ah h2{font-size:21px}}
+@media(min-width:900px){.auth{padding-block:40px}.auth .lgcard{width:124px}.auth .auth-card{padding:26px 24px 22px}.auth .ah h2{font-size:26px}}
+
+/* ---------- login v3.1: brand logo pinned in the top-left corner ---------- */
+.auth{flex-direction:column;align-items:stretch;padding-top:calc(16px + env(safe-area-inset-top))!important}
+.abar{width:100%;max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;flex:none;animation:up .5s var(--ease) both}
+.abar .am{width:50px;height:50px;border-radius:16px;background:#fff;display:grid;place-items:center;flex:none;box-shadow:0 12px 26px -8px #1a063a99,0 0 0 4px #ffffff24,inset 0 -3px 8px #8e2a8c14}
+.abar .am img{width:34px;height:34px;object-fit:contain;display:block}
+.abar .an{min-width:0;flex:1;text-align:left}
+.abar h1{margin:0;font-size:20px;line-height:1.1;font-weight:800;letter-spacing:-.2px;color:#fff;text-shadow:0 2px 10px #1a063a66}
+.abar small{display:block;margin-top:3px;font-size:10.5px;letter-spacing:.07em;color:#ffffffc4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.abar .ap{display:inline-flex;align-items:center;gap:6px;flex:none;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:600;color:#fff;background:#ffffff22;border:1px solid #ffffff3d;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.abar .ap .ico{width:13px;height:13px}
+.auth .auth-in{margin:auto;padding-top:14px}
+@media(max-width:420px){.abar .ap{display:none}.abar .am{width:46px;height:46px;border-radius:15px}.abar h1{font-size:18px}}
+@media(max-height:700px){.auth .auth-in{padding-top:8px}.abar .am{width:42px;height:42px}.abar .am img{width:28px;height:28px}}
+@media(min-width:900px){.auth{padding-inline:40px}.abar .am{width:56px;height:56px}.abar h1{font-size:24px}.abar small{font-size:11.5px}}
