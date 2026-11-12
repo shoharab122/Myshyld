@@ -71,3 +71,5 @@ button.rw{cursor:pointer}button.rw:hover{background:#faf7fc}.g1{flex:1;min-width
 }
 @media print{.sb,.top,.mb .mh,.acts,.steps,.md .bt{display:none}.mb{position:static;background:#fff}}
 @media(prefers-reduced-motion:reduce){.spin{animation-duration:3s}.tg i{transition:none}}
+/* bKash verification */
+.bk-a{display:grid;gap:8px}.bk-a p{margin:0}.bk-a b{display:block;font-size:1.05rem;letter-spacing:.4px}.bk-a.wait{border-color:#f0b4cf;background:#fff7fb}
